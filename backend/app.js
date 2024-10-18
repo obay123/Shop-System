@@ -1,11 +1,19 @@
 const connectDB = require('./config/databse');
 const express = require('express')
 const app = express()
+
 require('dotenv').config
+connectDB()
+
 app.use(express.json()) 
 
 
-connectDB()
+
+
+
+
+const itemRoutes = require('./routes/itemsRoutes')
+app.use('api/items',itemRoutes)
 
 app.get('/',(req,res)=>{
     console.log('user hit the resource')

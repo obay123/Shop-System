@@ -1,6 +1,6 @@
 const Item = require('../models/itemSchema')
 
-const Item = require('../models/Item');
+
 
 getItemsByDaysAgo = async (req, res) => {
   try {
