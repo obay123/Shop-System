@@ -1,26 +1,28 @@
 const connectDB = require('./config/databse');
-const express = require('express')
-const app = express()
+const express = require('express');
+const app = express();
 
-require('dotenv').config
-connectDB()
+require('dotenv').config();
+connectDB();
 
-app.use(express.json()) 
+app.use(express.json()); 
 
+// Import  routes
+const deptRoutes = require('./routes/deptRoutes');
+const soldItemRoutes = require('./routes/soldItemRoutes');
+const itemRoutes = require('./routes/itemsRoutes');
 
+// Use  routes 
+app.use('/api/items', itemRoutes);  // Correct usage of items route
+app.use('/api/soldItems', soldItemRoutes);  // Correct usage of sold items route
+app.use('/api/debt', deptRoutes);  // Correct usage of debt route
 
+// Simple test route
+app.get('/', (req, res) => {
+  console.log('user hit the resource');
+  res.status(200).send('home page');
+});
 
-
-
-const itemRoutes = require('./routes/itemsRoutes')
-app.use('api/items',itemRoutes)
-
-app.get('/',(req,res)=>{
-    console.log('user hit the resource')
-    res.status(200).send('home page')
-})
-
-
-app.listen(process.env.PORT, ()=>
-console.log('server is runnning on port 5000......')
-)
+app.listen(process.env.PORT, () =>
+  console.log(`Server is running on port ${process.env.PORT}...`)
+);

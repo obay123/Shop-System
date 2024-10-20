@@ -1,6 +1,7 @@
-const express  = require('express')
-const router = express.Router
+const express = require('express')
+const router = express.Router()
+const {getDebts} = require('../controllers/deptController')
 
-router.get('/api/dept',(req,res)=>{
-    res.status(200).json({sucess:true,data:dept})
-})
+router.get('api/Debts', getDebts)
+
+module.exports = router

@@ -1,18 +1,11 @@
-const express  = require('express')
-const router = express.Router()
+const express = require('express');
+const router = express.Router();
+const { addItem, editItem, deleteItem ,getItems} = require('../controllers/itemController');
 
+// Routes for managing items
+router.get('/api/items',getItems);//fetch items
+router.post('/api/items', addItem); // Add item
+router.patch('/api/items/:id', editItem); // Edit item
+router.delete('/api/items/:id', deleteItem); // Delete item
 
-const  {
-    getItemsByDaysAgo,
-    addItem,
-    editItem,
-    deleteItem
-       }=require('../controllers/itemController')
-
-
-    router.route('/').get(getItemsByDaysAgo).post(addItem)
-    router.route('/:id').patch(editItem).delete(deleteItem)
-
-
-
-    module.exports = router;  
+module.exports = router;
