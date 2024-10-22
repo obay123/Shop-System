@@ -10,11 +10,11 @@ app.use(express.json());
 // Import  routes
 const deptRoutes = require('./routes/deptRoutes');
 const soldItemRoutes = require('./routes/soldItemRoutes');
-const itemRoutes = require('./routes/itemsRoutes');
+const itemsRoutes = require('./routes/itemsRoutes');
 
 // Use  routes 
-app.use('/api/items', itemRoutes);  // Correct usage of items route
-app.use('/api/soldItems', soldItemRoutes);  // Correct usage of sold items route
+app.use('/', itemsRoutes);  // Correct usage of items route
+app.use('/', soldItemRoutes);  // Correct usage of sold items route
 app.use('/api/debt', deptRoutes);  // Correct usage of debt route
 
 // Simple test route
