@@ -10,7 +10,8 @@ const reportSchema = new mongoose.Schema({
     soldItems: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'SoldItem',  // Reference to SoldItem
-        required: true
+        default:'empty',
+        required: false
     }],
     totalAmount: {
         type: Number,
