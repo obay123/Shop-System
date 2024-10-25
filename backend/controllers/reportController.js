@@ -1,25 +1,34 @@
 const Report = require('../models/reportSchema');
 const SoldItem = require('../models/soldItemSchema');
+const Item = require('../models/itemSchema');
+
 
 // Create a new report
 exports.createReport = async (req, res) => {
   try {
     const { soldItems } = req.body;
 
-    // Calculate total amount from sold items
     let totalAmount = 0;
-    for (const itemId of soldItems) {
-      const soldItem = await SoldItem.findById(itemId);
-      if (soldItem) {
-        totalAmount += soldItem.total;
-      }else{
-        res.status(500).json({message:'no sold items founds'})
+    const reportSoldItems = [];
+
+    // Populate reportSoldItems with item details and calculate the total amount
+    for (const soldItem of soldItems) {
+      const item = await Item.findById(soldItem.itemId);
+      if (!item) {
+        return res.status(404).json({ message: `Item with ID ${soldItem.itemId} not found` });
       }
- 
+
+      const itemTotal = item.price * soldItem.quantitySold;
+      totalAmount += itemTotal;
+
+      reportSoldItems.push({
+        itemId: soldItem.itemId,
+        quantitySold: soldItem.quantitySold,
+        total: itemTotal
+      });
     }
 
-    // Create and save the new report
-    const newReport = new Report({ soldItems, totalAmount });
+    const newReport = new Report({ soldItems: reportSoldItems, totalAmount });
     const savedReport = await newReport.save();
     res.status(201).json(savedReport);
   } catch (error) {
@@ -27,73 +36,42 @@ exports.createReport = async (req, res) => {
   }
 };
 
+// Delete an entire report and its sold items
+exports.deleteReport = async (req, res) => {
+  const { reportId } = req.params;
 
+  try {
+    const report = await Report.findByIdAndDelete(reportId);
+    if (!report) {
+      return res.status(404).json({ message: 'Report not found' });
+    }
+
+    res.status(200).json({ message: 'Report and associated sold items deleted' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting report', error });
+  }
+};
 
 // Get a report by date
 exports.getReportByDate = async (req, res) => {
   const { date } = req.params;
 
   try {
-    const report = await Report.findOne({ date: new Date(date) }).populate('soldItems');
-    if (!report) {
-      return res.status(404).json({ message: 'No report found for this date' });
-    }
-    res.status(200).json(report);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching report', error });
-  }
-};
+      // Convert the date string into a Date object
+      const targetDate = new Date(date);
+      targetDate.setHours(0, 0, 0, 0); // Set time to the start of the day
 
-exports.editReport = async (req, res) => {
-    const { reportId } = req.params;
-    const { soldItems } = req.body;
-  
-    try {
-      // Find the report
-      const report = await Report.findById(reportId);
+      // Find the report for the specified date and populate the sold items
+      const report = await Report.findOne({ date: targetDate }).populate('soldItems');
+      
       if (!report) {
-        return res.status(404).json({ message: 'Report not found' });
+          return res.status(404).json({ message: 'No report found for this date' });
       }
-  
-      // Update sold items and recalculate total amount
-      report.soldItems = soldItems;
-  
-      let totalAmount = 0;
-      for (const itemId of soldItems) {
-        const soldItem = await SoldItem.findById(itemId);
-        if (soldItem) {
-          totalAmount += soldItem.total;
-        }
-      }
-      report.totalAmount = totalAmount;
-  
-      // Save the updated report
-      const updatedReport = await report.save();
-      res.status(200).json(updatedReport);
-    } catch (error) {
-      res.status(500).json({ message: 'Error updating report', error });
-    }
-  };
-  
 
-// Delete a report
-exports.deleteReport = async (req, res) => {
-    const { reportId } = req.params;
-    try {
-      await Report.findByIdAndDelete(reportId);
-      res.status(200).json({ message: 'Report deleted' });
-    } catch (error) {
-      res.status(500).json({ message: 'Error deleting report', error });
-    }
-  };
-  
-
-// Get all reports
-exports.getAllReports = async (req, res) => {
-  try {
-    const reports = await Report.find().populate('soldItem');
-    res.status(200).json(reports);
+      res.status(200).json(report);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching reports', error });
+      res.status(500).json({ message: 'Error fetching report', error });
   }
 };
+
+

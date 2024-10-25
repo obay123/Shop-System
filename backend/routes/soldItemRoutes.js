@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { getSoldItemsByDaysAgo  ,addSoldItem, editSoldItem, deleteSoldItem } = require('../controllers/soldItemController');
+const soldItemController = require('../controllers/soldItemController');
 
-// Routes for managing sold items
-router.get('/api/soldItems',getSoldItemsByDaysAgo ) //get today solditems
-router.post('/api/soldItems', addSoldItem); // Add a sold item
-router.patch('/api/soldItems/:id', editSoldItem); // Edit a sold item
-router.delete('/api/soldItems/:id', deleteSoldItem); // Delete a sold item
+// Route to add a sold item to a report
+router.post('/:reportId/add', soldItemController.addSoldItemsToReport);
+
+// Route to edit a specific sold item in a report
+router.put('/:reportId/edit/:soldItemId', soldItemController.editSingleSoldItemInReport);
+
+// Route to delete a specific sold item from a report
+router.delete('/:reportId/delete/:soldItemId', soldItemController.deleteSingleSoldItemFromReport);
 
 module.exports = router;

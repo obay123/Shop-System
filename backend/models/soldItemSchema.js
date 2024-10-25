@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const soldItemSchema = new mongoose.Schema({
     itemId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Item', // Reference to the Item model
+        ref: 'Item',
         required: true
     },
     quantitySold: {
@@ -13,12 +13,7 @@ const soldItemSchema = new mongoose.Schema({
     total: {
         type: Number,
         required: true
-    },
-    date: {
-        type: Date,
-        default: Date.now
     }
 });
 
-const SoldItem = mongoose.model('SoldItem', soldItemSchema);
-module.exports = SoldItem;
+module.exports = soldItemSchema;

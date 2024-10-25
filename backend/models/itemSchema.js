@@ -9,11 +9,7 @@ const itemSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    image: {
-        type: String, 
-        required: false 
-    }
+    image: String
 });
 
-const Item = mongoose.model('Item', itemSchema);
-module.exports = Item;
+module.exports = mongoose.model('Item', itemSchema);

@@ -1,112 +1,98 @@
 const SoldItem = require('../models/soldItemSchema');
+const Report = require('../models/reportSchema');
 const Item = require('../models/itemSchema');
 
-exports.getSoldItemsByDaysAgo = async (req, res) => {
+// Add sold items to an existing report
+exports.addSoldItemsToReport = async (req, res) => {
+    const { reportId } = req.params;
+    const { soldItems } = req.body;
+  
     try {
-      const daysAgo = parseInt(req.query.daysAgo) || 0;
-      const startOfDay = new Date();
-      startOfDay.setDate(startOfDay.getDate() - daysAgo);
-      startOfDay.setHours(0, 0, 0, 0);
-  
-      const endOfDay = new Date();
-      endOfDay.setDate(endOfDay.getDate() - daysAgo);
-      endOfDay.setHours(23, 59, 59, 999);
-  
-      const soldItems = await SoldItem.find({
-        date: {
-          $gte: startOfDay,
-          $lt: endOfDay
-        }
-      });
-  
-      if (!soldItems.length) {
-        return res.status(404).json({ message: `No sold items found for ${daysAgo} days ago` });
+      const report = await Report.findById(reportId);
+      if (!report) {
+        return res.status(404).json({ message: 'Report not found' });
       }
-      res.status(200).json(soldItems);
+  
+      // Add new sold items and calculate the total
+      for (const soldItem of soldItems) {
+        const item = await Item.findById(soldItem.itemId);
+        if (!item) {
+          return res.status(404).json({ message: `Item with ID ${soldItem.itemId} not found` });
+        }
+  
+        const itemTotal = item.price * soldItem.quantitySold;
+        report.totalAmount += itemTotal;
+  
+        report.soldItems.push({
+          itemId: soldItem.itemId,
+          quantitySold: soldItem.quantitySold,
+          total: itemTotal
+        });
+      }
+  
+      const updatedReport = await report.save();
+      res.status(200).json(updatedReport);
     } catch (error) {
-      res.status(500).json({ message: 'Error fetching sold items', error });
+      res.status(500).json({ message: 'Error adding sold items to report', error });
     }
   };
   
 
-// Add a sold item
-exports.addSoldItem = async (req, res) => {
-    const { itemId, quantitySold, date } = req.body;
-
+  // Edit a single sold item in a report
+exports.editSingleSoldItemInReport = async (req, res) => {
+    const { reportId, soldItemId } = req.params;
+    const { quantitySold } = req.body;
+  
     try {
-        // Fetch the item by its ID to get the price
-        const item = await Item.findById(itemId);
-
-        if (!item) {
-            return res.status(404).json({ message: 'Item not found' });
-        }
-
-        // Calculate the total price based on the item's price and quantity sold
-        const total = item.price * quantitySold;
-
-        // Create a new sold item record
-        const newSoldItem = new SoldItem({
-            item: itemId,
-            quantitySold,
-            total,
-            date: date || new Date() // Set to today if not provided
-        });
-
-        // Save the sold item to the database
-        const savedSoldItem = await newSoldItem.save();
-        res.status(201).json(savedSoldItem);
+      const report = await Report.findById(reportId);
+      if (!report) {
+        return res.status(404).json({ message: 'Report not found' });
+      }
+  
+      const soldItemIndex = report.soldItems.findIndex(item => item._id.toString() === soldItemId);
+      if (soldItemIndex === -1) {
+        return res.status(404).json({ message: 'Sold item not found in report' });
+      }
+  
+      const soldItem = report.soldItems[soldItemIndex];
+      const item = await Item.findById(soldItem.itemId);
+  
+      report.totalAmount -= soldItem.total;  // Deduct old total
+      soldItem.quantitySold = quantitySold;
+      soldItem.total = item.price * quantitySold;
+      report.totalAmount += soldItem.total;  // Add new total
+  
+      const updatedReport = await report.save();
+      res.status(200).json(updatedReport);
     } catch (error) {
-        res.status(500).json({ message: 'Error while adding sold item', error });
+      res.status(500).json({ message: 'Error updating sold item in report', error });
     }
-};
+  };
+  
 
-// Edit an existing sold item
-exports.editSoldItem = async (req, res) => {
-    const { id } = req.params;
-    const { itemId, quantitySold } = req.body;
-
+  // Delete a single sold item from a report
+exports.deleteSingleSoldItemFromReport = async (req, res) => {
+    const { reportId, soldItemId } = req.params;
+  
     try {
-        // Fetch the new item by ID (if it's changed) to get the updated price
-        const item = await Item.findById(itemId);
-
-        if (!item) {
-            return res.status(404).json({ message: 'Item not found' });
-        }
-
-        // Calculate the new total price
-        const total = item.price * quantitySold;
-
-        // Update the sold item
-        const updatedSoldItem = await SoldItem.findByIdAndUpdate(
-            id,
-            { item: itemId, quantitySold, total },
-            { new: true }
-        );
-
-        if (!updatedSoldItem) {
-            return res.status(404).json({ message: 'Sold item not found' });
-        }
-
-        res.status(200).json(updatedSoldItem);
+      const report = await Report.findById(reportId);
+      if (!report) {
+        return res.status(404).json({ message: 'Report not found' });
+      }
+  
+      const soldItemIndex = report.soldItems.findIndex(item => item._id.toString() === soldItemId);
+      if (soldItemIndex === -1) {
+        return res.status(404).json({ message: 'Sold item not found in report' });
+      }
+  
+      const soldItem = report.soldItems[soldItemIndex];
+      report.totalAmount -= soldItem.total;  // Deduct item total from report total
+      report.soldItems.splice(soldItemIndex, 1);  // Remove sold item from array
+  
+      const updatedReport = await report.save();
+      res.status(200).json(updatedReport);
     } catch (error) {
-        res.status(500).json({ message: 'Error while updating sold item', error });
+      res.status(500).json({ message: 'Error deleting sold item from report', error });
     }
-};
-
-// Delete a sold item
-exports.deleteSoldItem = async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        // Find the sold item by ID and delete it
-        const deletedSoldItem = await SoldItem.findByIdAndDelete(id);
-
-        if (!deletedSoldItem) {
-            return res.status(404).json({ message: 'Sold item not found' });
-        }
-
-        res.status(200).json({ message: 'Sold item deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error while deleting sold item', error });
-    }
-};
+  };
+  
