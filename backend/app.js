@@ -1,13 +1,21 @@
 const express = require('express');
 const app = express();
+
+
+//importing routes
 const reportRoutes = require('./routes/reportRoutes');
 const soldItemRoutes = require('./routes/soldItemRoutes');
+const ItemRoutes = require('./routes/itemsRoutes')
+
+
+//Databse connection
 const connectDB = require('./config/databse');
 
-
+//dotevnv and invoking db connection funciton
 require('dotenv').config();
 connectDB();
 
+//json middleware
 app.use(express.json());
 
 // Use report routes
@@ -15,6 +23,10 @@ app.use('/api/reports', reportRoutes);
 
 // Use sold item routes
 app.use('/api/solditems', soldItemRoutes);
+
+//use Item routes
+app.use('/api/items', ItemRoutes)
+
 
 app.get('/',(req,res)=>{
   res.send('hello there')
