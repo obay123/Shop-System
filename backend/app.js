@@ -28,7 +28,7 @@ app.use('/api/solditems', soldItemRoutes);
 app.use('/api/items', ItemRoutes)
 
 //use Debt routes
-app.use('api/debts', debtRoutes)
+app.use('/api/debt', debtRoutes)
 
 
 

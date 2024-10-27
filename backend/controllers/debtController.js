@@ -69,3 +69,47 @@ exports.deleteDebt = async (req, res) => {
         res.status(500).json({ message: 'Error while deleting the debt', error });
     }
 };
+
+// Edit a debt: Update the amount or add more items
+exports.editDebt = async (req, res) => {
+  const { debtId } = req.params;
+  const { amountPaid, additionalItems } = req.body;
+
+  try {
+    // Find the debt by ID
+    const debt = await Debt.findById(debtId);
+    if (!debt) {
+      return res.status(404).json({ message: 'Debt not found' });
+    }
+
+    // Update debt amount by subtracting the amount paid
+    if (amountPaid) {
+      debt.amount -= amountPaid;
+      if (debt.amount < 0) debt.amount = 0; // Prevent negative debt
+    }
+
+    // Add new items to the debt, if provided
+    if (additionalItems && additionalItems.length > 0) {
+      for (const item of additionalItems) {
+        const product = await Item.findById(item.itemId);
+        if (!product) {
+          return res.status(404).json({ message: `Item with ID ${item.itemId} not found` });
+        }
+
+        // Add the item details
+        debt.items.push({
+          itemName: product.name,
+          quantity: item.quantity
+        });
+
+        // Update the debt amount based on new items added
+        debt.amount += product.price * item.quantity;
+      }
+    }
+
+    const updatedDebt = await debt.save();
+    res.status(200).json(updatedDebt);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating debt', error });
+  }
+};
