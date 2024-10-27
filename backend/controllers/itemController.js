@@ -3,7 +3,7 @@ const Item = require('../models/itemSchema');
 //get all items
 exports.getItems = async(req,res)=>{
   try{
-  const items = await Items.find()
+  const items = await Item.find()
   if(items.length===0){
     return res.status(404).json({message:"no items found"})
   }

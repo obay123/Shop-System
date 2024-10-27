@@ -16,7 +16,7 @@ const debtSchema = new mongoose.Schema({
   },
   items: [
     {
-      itemName: { type: String, required: false, default:''},  // could also store product info
+      itemName: { type: String, required: false, default:'سلعة'},  // could also store product info
       quantity: { type: Number, required: false }
     }
   ]
