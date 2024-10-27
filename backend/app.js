@@ -6,7 +6,7 @@ const app = express();
 const reportRoutes = require('./routes/reportRoutes');
 const soldItemRoutes = require('./routes/soldItemRoutes');
 const ItemRoutes = require('./routes/itemsRoutes')
-
+const debtRoutes = require('./routes/debtRoutes')
 
 //Databse connection
 const connectDB = require('./config/databse');
@@ -26,6 +26,10 @@ app.use('/api/solditems', soldItemRoutes);
 
 //use Item routes
 app.use('/api/items', ItemRoutes)
+
+//use Debt routes
+app.use('api/debts', debtRoutes)
+
 
 
 app.get('/',(req,res)=>{

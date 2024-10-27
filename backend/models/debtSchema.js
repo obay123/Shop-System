@@ -5,7 +5,7 @@ const debtSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  amount: {  // renamed from 'quantity'
+  amount: {
     type: Number,
     required: true
   },
@@ -16,8 +16,9 @@ const debtSchema = new mongoose.Schema({
   },
   items: [
     {
-      itemName: { type: String, required: false, default:'سلعة'},  // could also store product info
-      quantity: { type: Number, required: false }
+      itemName: { type: String, required: true },  // Stores the name of the item
+      price: { type: Number, required: true },     // Stores the price of each item
+      quantity: { type: Number, required: true }   // Stores the quantity purchased
     }
   ]
 });

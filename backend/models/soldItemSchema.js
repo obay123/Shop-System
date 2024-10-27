@@ -8,7 +8,8 @@ const soldItemSchema = new mongoose.Schema({
     },
     quantitySold: {
         type: Number,
-        required: true
+        required: true,
+        default:0
     },
     total: {
         type: Number,

@@ -7,7 +7,8 @@ const reportSchema = new mongoose.Schema({
         default: Date.now,
         unique: true
     },
-    soldItems: [soldItemSchema], // Embed sold items directly
+    soldItems:[soldItemSchema],// Embed sold items directly
+    
     totalAmount: {
         type: Number,
         default: 0
