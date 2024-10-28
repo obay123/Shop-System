@@ -3,31 +3,33 @@ const SoldItem = require('../models/soldItemSchema');
 const Item = require('../models/itemSchema');
 
 
-// Create a new report
 exports.createReport = async (req, res) => {
   try {
-    const { soldItems } = req.body;
+    const { soldItems = [] } = req.body; // Default to an empty array if soldItems is undefined
 
     let totalAmount = 0;
     const reportSoldItems = [];
 
-    // Populate reportSoldItems with item details and calculate the total amount
-    for (const soldItem of soldItems) {
-      const item = await Item.findById(soldItem.itemId);
-      if (!item) {
-        return res.status(404).json({ message: `Item with ID ${soldItem.itemId} not found` });
+    // If soldItems is provided, populate reportSoldItems with item details and calculate totalAmount
+    if (soldItems.length > 0) {
+      for (const soldItem of soldItems) {
+        const item = await Item.findById(soldItem.itemId);
+        if (!item) {
+          return res.status(404).json({ message: `Item with ID ${soldItem.itemId} not found` });
+        }
+
+        const itemTotal = item.price * soldItem.quantitySold;
+        totalAmount += itemTotal;
+
+        reportSoldItems.push({
+          itemId: soldItem.itemId,
+          quantitySold: soldItem.quantitySold,
+          total: itemTotal
+        });
       }
-
-      const itemTotal = item.price * soldItem.quantitySold;
-      totalAmount += itemTotal;
-
-      reportSoldItems.push({
-        itemId: soldItem.itemId,
-        quantitySold: soldItem.quantitySold,
-        total: itemTotal
-      });
     }
 
+    // Create the new report, even if reportSoldItems is empty
     const newReport = new Report({ soldItems: reportSoldItems, totalAmount });
     const savedReport = await newReport.save();
     res.status(201).json(savedReport);

@@ -3,7 +3,7 @@ const router = express.Router();
 const soldItemController = require('../controllers/soldItemController');
 
 // Route to add a sold item to a report
-router.post('/:reportId/add', soldItemController.addSoldItemsToReport);
+router.post('/:reportId/add', soldItemController.addSoldItemToReport);
 
 // Route to edit a specific sold item in a report
 router.put('/:reportId/edit/:soldItemId', soldItemController.editSingleSoldItemInReport);
