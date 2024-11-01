@@ -57,6 +57,27 @@ exports.getDebts = async (req, res) => {
     }
 };
 
+
+exports.getDebtByName = async (req, res) => {
+  const { name } = req.body;
+
+  try {
+      // Search for the debt entry with the specified name
+      const debt = await Debt.findOne({ name });
+
+      // Check if debt entry was found
+      if (!debt) {
+          return res.status(404).json({ message: `No debt found for name: ${name}` });
+      }
+
+      // Send back the found debt entry
+      res.status(200).json(debt);
+  } catch (error) {
+      console.error("Error fetching debt by name:", error);
+      res.status(500).json({ message: 'Error fetching debt', error });
+  }
+};
+
 // Delete a specific debt
 exports.deleteDebt = async (req, res) => {
     const { id } = req.params;
