@@ -12,7 +12,11 @@ const reportSchema = new mongoose.Schema({
     totalAmount: {
         type: Number,
         default: 0
-    }
+    },
+    shopId: { type: mongoose.Schema.Types.ObjectId, 
+              ref: 'Shop',
+              required: true 
+        },
 });
 
 module.exports = mongoose.model('Report', reportSchema);

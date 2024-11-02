@@ -20,7 +20,12 @@ const debtSchema = new mongoose.Schema({
       price: { type: Number, required: true },     // Stores the price of each item
       quantity: { type: Number, required: true }   // Stores the quantity purchased
     }
-  ]
+  ],
+  shopId: {
+     type: mongoose.Schema.Types.ObjectId,
+      ref: 'Shop', 
+      required: true 
+    },
 });
 
 const Debt = mongoose.model('Debt', debtSchema);

@@ -9,7 +9,12 @@ const itemSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    image: String
+    image: String,
+
+    shopId: { 
+        type: mongoose.Schema.Types.ObjectId,
+         ref: 'Shop',
+         required: true },
 });
 
 module.exports = mongoose.model('Item', itemSchema);
