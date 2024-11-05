@@ -17,14 +17,12 @@ exports.addItem = async (req, res) => {
     const { name, price, image } = req.body;
 
     try {
-        // Create a new item
         const newItem = new Item({
             name,
             price,
-            image // URL of the image (optional)
+            image 
         });
 
-        // Save the item to the database
         const savedItem = await newItem.save();
         res.status(201).json(savedItem);
     } catch (error) {
@@ -32,7 +30,7 @@ exports.addItem = async (req, res) => {
     }
 };
 
-// Edit an existing item
+
 exports.editItem = async (req, res) => {
     const { id } = req.params;
 
