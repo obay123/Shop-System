@@ -7,7 +7,10 @@ const shopSchema = new mongoose.Schema({
          },
     owner: { 
         type: String,
-         required: true 
+         required: false ,
+         default: function() {
+            return this.name;
+        } 
         },
     
     // Authentication fields:

@@ -45,11 +45,11 @@ exports.editItem = async (req, res) => {
         res.status(500).json({ message: 'Error while updating the item', error });
     }
 };
-
+ 
 // Delete an item
 exports.deleteItem = async (req, res) => {
     const { id } = req.params;
-
+    
     try {
         // Find the item by ID and delete it
         const deletedItem = await Item.findByIdAndDelete(id);

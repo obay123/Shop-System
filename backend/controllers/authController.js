@@ -1,8 +1,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Shop = require('../models/shopSchema');
+
 require('dotenv').configure()
-// Secret key for JWT
+
 const JWT_SECRET = process.env.JWT_SECRET; 
 
 
