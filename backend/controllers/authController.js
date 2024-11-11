@@ -57,3 +57,19 @@ exports.loginShop = async (req, res) => {
         res.status(500).json({ message: 'Error logging in', error });
     }
 };
+
+//delete shop
+
+exports.deleteShop = async (req, res) => {
+    const { shopId } = req.params; 
+    try {
+        const deletedShop = await Shop.findByIdAndDelete(shopId);
+
+        if (!deletedShop) {
+            return res.status(404).json({ message: 'Shop not found' });
+        }
+        res.status(200).json({ message: 'Shop deleted successfully', deletedShop });
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting shop', error });
+    }
+};

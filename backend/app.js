@@ -36,7 +36,7 @@ app.use('/api/items', verifyToken,ItemRoutes)
 app.use('/api/debt', verifyToken,debtRoutes)
 
 //use milk routes
-// app.use('/api/milk',verifyToken,milkRoutes)
+app.use('/api/milk', verifyToken, milkRoutes);
 
 app.get('/',(req,res)=>{
   res.send('hello there')

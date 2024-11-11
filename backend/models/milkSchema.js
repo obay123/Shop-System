@@ -5,7 +5,7 @@ const milkSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    Price:{
+    price:{
         type:Number,
         default:0.60
     },
