@@ -7,7 +7,7 @@ const reportRoutes = require('./routes/reportRoutes');
 const soldItemRoutes = require('./routes/soldItemRoutes');
 const ItemRoutes = require('./routes/itemsRoutes')
 const debtRoutes = require('./routes/debtRoutes')
-
+const milkRoutes = require('./routes/milkRoutes')
 //Databse connection
 const connectDB = require('./config/databse');
 
@@ -30,7 +30,8 @@ app.use('/api/items', ItemRoutes)
 //use Debt routes
 app.use('/api/debt', debtRoutes)
 
-
+//use milk routes
+app.use('/api/milk',milkRoutes)
 
 app.get('/',(req,res)=>{
   res.send('hello there')
