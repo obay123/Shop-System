@@ -4,7 +4,7 @@ const shopSchema = new mongoose.Schema({
     name: {
          type: String,
           required: true,
-          default: Guest
+          default: "Guest"
          },
     owner: { 
         type: String,
