@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const shopSchema = new mongoose.Schema({
     name: {
          type: String,
-          required: true
+          required: true,
+          default: Guest
          },
     owner: { 
         type: String,

@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Shop = require('../models/shopSchema');
 
-require('dotenv').configure()
+require('dotenv').config()
 
 const JWT_SECRET = process.env.JWT_SECRET; 
 
@@ -11,6 +11,9 @@ exports.registerShop = async (req, res) => {
     const { name, owner, email, password } = req.body;
 
     try {
+        if(!email||!password){
+            return res.status(404).json({message:'no email or password was provided'})
+        }
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
