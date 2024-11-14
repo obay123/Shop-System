@@ -1,53 +1,38 @@
 import axios from 'axios';
 
-const API_URL = '/api/debts'; // Adjust this if your API base URL is different
+const API_URL = '/api/debts';
 
-// Function to create a new debt
-export const createDebt = async (debtData) => {
+export const getDebts = async () => {
     try {
-        const response = await axios.post(`${API_URL}/create`, debtData);
+        const response = await axios.get(API_URL, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
         return response.data;
     } catch (error) {
-        throw error.response.data; // Propagate the error for handling
+        throw error.response.data
     }
 };
+export const findByName = async (name) => {
 
-// Function to fetch a debt by name
-export const fetchDebtByName = async (debtName) => {
-    try {
-        const response = await axios.post(`${API_URL}/fetchByName`, { name: debtName });
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
+}
+
+export const addDebt = async (debtData) => {
+    const response = await axios.post(`${API_URL}/create`, debtData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    return response.data;
 };
 
-// Function to edit a debt
-export const editDebt = async (debtId, updateData) => {
-    try {
-        const response = await axios.put(`${API_URL}/edit/${debtId}`, updateData);
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
+export const updateDebt = async (id, debtData) => {
+    const response = await axios.patch(`${API_URL}/edit/${id}`, debtData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    return response.data;
 };
 
-// Function to delete a debt
-export const deleteDebt = async (debtId) => {
-    try {
-        const response = await axios.delete(`${API_URL}/delete/${debtId}`);
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
-};
-
-// Function to get all debts (if needed)
-export const getAllDebts = async () => {
-    try {
-        const response = await axios.get(`${API_URL}/all`);
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
+export const deleteDebt = async (id) => {
+    const response = await axios.delete(`${API_URL}/delete/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    return response.data;
 };

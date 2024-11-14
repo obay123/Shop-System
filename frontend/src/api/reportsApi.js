@@ -2,52 +2,30 @@ import axios from 'axios';
 
 const API_URL = '/api/reports';
 
-// Function to create a new report
-export const createReport = async (reportData) => {
-    try {
-        const response = await axios.post(`${API_URL}/create`, reportData);
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
+export const getReports = async (date) => {
+    const response = await axios.get(`${API_URL}/${date}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    return response.data;
 };
 
-// Function to fetch a report by ID
-export const fetchReportById = async (reportId) => {
-    try {
-        const response = await axios.get(`${API_URL}/${reportId}`);
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
+export const addReport = async (reportData) => {
+    const response = await axios.post(`${API_URL}/create`, reportData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    return response.data;
 };
 
-// Function to edit a report
-export const editReport = async (reportId, updateData) => {
-    try {
-        const response = await axios.put(`${API_URL}/edit/${reportId}`, updateData);
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
-};
+// export const updateReport = async (id, reportData) => {
+//     const response = await axios.patch(`${API_URL}/delete/${id}`, reportData, {
+//         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+//     });
+//     return response.data;
+// };
 
-// Function to delete a report
-export const deleteReport = async (reportId) => {
-    try {
-        const response = await axios.delete(`${API_URL}/delete/${reportId}`);
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
-};
-
-// Function to get all reports
-export const getAllReports = async () => {
-    try {
-        const response = await axios.get(`${API_URL}/all`);
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
+export const deleteReport = async (id) => {
+    const response = await axios.delete(`${API_URL}/delete/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    return response.data;
 };

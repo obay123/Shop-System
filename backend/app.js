@@ -33,7 +33,7 @@ app.use('/api/solditems', verifyToken,soldItemRoutes);
 app.use('/api/items', verifyToken,ItemRoutes)
 
 //use Debt routes
-app.use('/api/debt', verifyToken,debtRoutes)
+app.use('/api/debts', verifyToken,debtRoutes)
 
 //use milk routes
 app.use('/api/milk', verifyToken, milkRoutes);
