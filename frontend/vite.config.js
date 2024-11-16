@@ -1,7 +1,16 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+// vite.config.js
 
-// https://vite.dev/config/
+
 export default defineConfig({
-  plugins: [react()],
-})
+  esbuild: {
+    jsx: 'react', // enables JSX parsing in .js files
+    loader: {
+      '.js': 'jsx'  // Treat .js files as JSX
+    },
+    plugins: [react()]
+  }
+});
+
+
