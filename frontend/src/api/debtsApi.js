@@ -1,38 +1,54 @@
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = '/api/debts';
 
-export const getDebts = async () => {
-    try {
-        const response = await axios.get(API_URL, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
-        return response.data;
-    } catch (error) {
-        throw error.response.data
-    }
-};
-export const findByName = async (name) => {
+export const useDebtsApi = () => {
+    const { authToken } = useAuth();
 
-}
+    const getDebts = async () => {
+        try {
+            const response = await axios.get(API_URL, {
+                headers: { Authorization: `Bearer ${authToken}` }
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || 'Error fetching debts.';
+        }
+    };
 
-export const addDebt = async (debtData) => {
-    const response = await axios.post(`${API_URL}/create`, debtData, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-    return response.data;
-};
+    const addDebt = async (debtData) => {
+        try {
+            const response = await axios.post(`${API_URL}/create`, debtData, {
+                headers: { Authorization: `Bearer ${authToken}` }
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || 'Error adding debt.';
+        }
+    };
 
-export const updateDebt = async (id, debtData) => {
-    const response = await axios.patch(`${API_URL}/edit/${id}`, debtData, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-    return response.data;
-};
+    const updateDebt = async (id, debtData) => {
+        try {
+            const response = await axios.patch(`${API_URL}/edit/${id}`, debtData, {
+                headers: { Authorization: `Bearer ${authToken}` }
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || 'Error updating debt.';
+        }
+    };
 
-export const deleteDebt = async (id) => {
-    const response = await axios.delete(`${API_URL}/delete/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-    return response.data;
+    const deleteDebt = async (id) => {
+        try {
+            const response = await axios.delete(`${API_URL}/delete/${id}`, {
+                headers: { Authorization: `Bearer ${authToken}` }
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || 'Error deleting debt.';
+        }
+    };
+
+    return { getDebts, addDebt, updateDebt, deleteDebt };
 };

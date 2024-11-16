@@ -1,30 +1,30 @@
 import React, { createContext, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-// Create the Auth Context
+
 const AuthContext = createContext();
 
-// Auth Provider Component
 export const AuthProvider = ({ children }) => {
-    const [authToken, setAuthToken] = useState(null); // To store the JWT token
+    const [authToken, setAuthToken] = useState(null); // Store token in state
     const navigate = useNavigate();
-    // Function to log in and set the auth token
+
+    // Login function to store token in state and localStorage
     const login = (token) => {
         setAuthToken(token);
-        localStorage.setItem('authToken', token); // Store token in localStorage for persistence
-        navigate('/homepage')
+        localStorage.setItem('authToken', token);
+        navigate('/homepage');
     };
 
-    // Function to log out and clear the token
+    // Logout function to clear token
     const logout = () => {
         setAuthToken(null);
-        localStorage.removeItem('authToken'); // Remove token from localStorage
-        navigate('/auth/login')
+        localStorage.removeItem('authToken');
+        navigate('/auth/login');
     };
 
-    // Function to check if the user is authenticated
+    // Check if the user is authenticated
     const isAuthenticated = () => !!authToken;
 
-    // Load token from localStorage on initial render if available
+    // Load token from localStorage on app load
     React.useEffect(() => {
         const token = localStorage.getItem('authToken');
         if (token) {
@@ -39,5 +39,5 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-// Custom Hook to use AuthContext in other components
+// Custom Hook to use AuthContext
 export const useAuth = () => useContext(AuthContext);

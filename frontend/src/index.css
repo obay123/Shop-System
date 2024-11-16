@@ -1,88 +1,110 @@
 /* Button.css */
 .btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border: none;
     border-radius: 4px;
     cursor: pointer;
-    border: none;
     transition: background-color 0.3s ease;
+    text-align: center;
 }
 
 .btn-primary {
-    background-color: #4CAF50;
+    background-color: #007bff;
     color: white;
-}
-
-.btn-primary:hover {
-    background-color: #45a049;
 }
 
 .btn-secondary {
-    background-color: #007BFF;
+    background-color: #6c757d;
     color: white;
-}
-
-.btn-secondary:hover {
-    background-color: #0056b3;
 }
 
 .btn-danger {
-    background-color: #DC3545;
+    background-color: #dc3545;
     color: white;
-}
-
-.btn-danger:hover {
-    background-color: #c82333;
 }
 
 .btn-medium {
     font-size: 1rem;
-}
-
-.btn-small {
-    font-size: 0.875rem;
     padding: 0.5rem 1rem;
 }
 
 .btn-large {
     font-size: 1.25rem;
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.25rem;
 }
 
-button:disabled {
+.btn-small {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.btn:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
 }
 
 /* Table.css */
+/* Table container for responsiveness */
+.table-container {
+    overflow-x: auto;
+    margin: 1rem 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Base table styles */
 .table {
     width: 100%;
     border-collapse: collapse;
-    margin: 20px 0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.table th,
-.table td {
-    padding: 12px 20px;
-    text-align: left;
+    text-align: right; /* Align text to the right for Arabic */
+    background-color: #ffffff;
+    font-size: 1rem;
     border: 1px solid #ddd;
+    word-wrap: break-word;
 }
 
-.table th {
+/* Table Header */
+.table thead th {
     background-color: #f4f4f4;
     color: #333;
     font-weight: bold;
+    padding: 0.8rem;
+    text-align: center; /* Center header text */
+    border: 1px solid #ddd;
 }
 
-.table tr:nth-child(even) {
+/* Table Body */
+.table tbody td {
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    text-align: right; /* Align cell text to the right */
+    color: #555;
+}
+
+/* Zebra Striping */
+.table tbody tr:nth-child(odd) {
     background-color: #f9f9f9;
 }
 
-.table tr:hover {
-    background-color: #f1f1f1;
+/* Hover Effect */
+.table tbody tr:hover {
+    background-color: #eaf2ff;
 }
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .table {
+        font-size: 0.9rem;
+    }
+
+    .table-container {
+        overflow-y: auto;
+    }
+}
+
 /* Modal.css */
+/* Modal overlay */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -93,47 +115,72 @@ button:disabled {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
 }
 
+/* Modal content */
 .modal-content {
-    background-color: white;
-    padding: 20px;
+    background-color: #fff;
     border-radius: 8px;
-    position: relative;
+    padding: 1.5rem;
     max-width: 500px;
-    width: 100%;
+    width: 90%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: fadeIn 0.3s ease;
+    box-sizing: border-box;
 }
 
+/* Modal close button */
 .modal-close {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: transparent;
+    top: 0.5rem;
+    left: 0.5rem; /* Adjusted for RTL */
+    background: none;
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
+    color: #333;
+    transition: color 0.2s ease;
 }
 
 .modal-close:hover {
-    color: red;
+    color: #4CAF50;
 }
+
+/* Animation for modal */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 /* Input.css */
 .input-container {
-    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
 }
 
 .input-label {
     font-size: 1rem;
-    margin-bottom: 5px;
-    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
 }
 
 .input-field {
-    width: 100%;
-    padding: 0.75rem;
+    padding: 0.5rem;
     font-size: 1rem;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 4px;
+    box-sizing: border-box;
+    background-color: #fff;
+    color: #333;
     outline: none;
     transition: border-color 0.3s ease;
 }
@@ -142,34 +189,39 @@ button:disabled {
     border-color: #4CAF50;
 }
 
-input:disabled {
-    background-color: #f1f1f1;
+.input-field::placeholder {
+    color: #aaa;
+    font-size: 0.9rem;
 }
+
 
 /* Card.css */
 .card {
-    width: 250px;
-    padding: 20px;
+    border: 2px solid;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
+    padding: 1rem;
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
-    margin: 10px;
 }
 
 .card:hover {
-    transform: translateY(-5px);
+    transform: scale(1.05);
 }
 
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 0.5rem;
 }
 
 .card-title {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     font-weight: bold;
 }
 
@@ -178,51 +230,70 @@ input:disabled {
 }
 
 .card-body {
-    font-size: 1.5rem;
-}
-
-.card-value {
-    font-weight: bold;
-}
-
-/* Notification.css */
-.notification {
-    padding: 15px;
-    border-radius: 4px;
-    margin: 10px 0;
-    font-size: 1rem;
-    color: white;
-    font-weight: bold;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 300px;
+}
+
+.card-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Base Notification styles */
+.notification {
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    word-wrap: break-word;
+    box-sizing: border-box;
+    animation: slideIn 0.3s ease;
+}
+
+/* Notification Types */
+.notification-info {
+    background-color: #e0f7fa;
+    color: #00796b;
+    border: 1px solid #4caf50;
 }
 
 .notification-success {
-    background-color: #4CAF50;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #4caf50;
 }
 
 .notification-error {
-    background-color: #DC3545;
-}
-
-.notification-info {
-    background-color: #007BFF;
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #e53935;
 }
 
 .notification-warning {
-    background-color: #FFC107;
+    background-color: #fff3e0;
+    color: #ef6c00;
+    border: 1px solid #ffa726;
 }
 
-.notification-close {
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 1.25rem;
-    cursor: pointer;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .notification {
+        font-size: 0.9rem;
+        padding: 0.8rem;
+    }
 }
 
-.notification-close:hover {
-    color: black;
+/* Animation */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

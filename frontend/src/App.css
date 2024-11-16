@@ -1,7 +1,15 @@
 body {
     direction: rtl;
     text-align: right;
+    font-family: 'Tajawal', sans-serif; /* Example Arabic font */
 }
-body {
-    font-family: 'Cairo', 'Tajawal', sans-serif;
+
+button, input, table {
+    direction: rtl;
+    text-align: right;
+}
+
+table th, table td {
+    text-align: right;
+    padding: 8px;
 }

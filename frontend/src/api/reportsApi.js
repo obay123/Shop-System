@@ -1,31 +1,43 @@
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = '/api/reports';
 
-export const getReports = async (date) => {
-    const response = await axios.get(`${API_URL}/${date}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-    return response.data;
-};
+export const useReportsApi = () => {
+    const { authToken } = useAuth();
 
-export const addReport = async (reportData) => {
-    const response = await axios.post(`${API_URL}/create`, reportData, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-    return response.data;
-};
+    const getReports = async () => {
+        try {
+            const response = await axios.get(API_URL, {
+                headers: { Authorization: `Bearer ${authToken}` }
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || 'Error fetching reports.';
+        }
+    };
 
-// export const updateReport = async (id, reportData) => {
-//     const response = await axios.patch(`${API_URL}/delete/${id}`, reportData, {
-//         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-//     });
-//     return response.data;
-// };
+    const addReport = async (reportData) => {
+        try {
+            const response = await axios.post(`${API_URL}/create`, reportData, {
+                headers: { Authorization: `Bearer ${authToken}` }
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || 'Error adding report.';
+        }
+    };
 
-export const deleteReport = async (id) => {
-    const response = await axios.delete(`${API_URL}/delete/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-    return response.data;
+    const deleteReport = async (id) => {
+        try {
+            const response = await axios.delete(`${API_URL}/delete/${id}`, {
+                headers: { Authorization: `Bearer ${authToken}` }
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || 'Error deleting report.';
+        }
+    };
+
+    return { getReports, addReport, deleteReport };
 };
