@@ -8,6 +8,7 @@ import ReportsPage from './pages/ReportsPage';
 import LoginPage from './pages/LoginPage'; 
 import ProfilePage from './pages/ProfilePage'; 
 import NotFoundPage from './pages/NotFoundPage'; 
+import './App.css'
 
 
 const App = () => {
