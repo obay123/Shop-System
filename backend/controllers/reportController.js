@@ -6,11 +6,16 @@ const Item = require('../models/itemSchema');
 exports.createReport = async (req, res) => {
   try {
     const { soldItems = [] } = req.body; // Default to an empty array if soldItems is undefined
+    const shopId = req.shopId; // Extracted from authMiddleware
+
+    if (!shopId) {
+      return res.status(400).json({ message: 'shopId is required but not provided' });
+    }
 
     let totalAmount = 0;
     const reportSoldItems = [];
 
-    // If soldItems is provided, populate reportSoldItems with item details and calculate totalAmount
+    // Populate `reportSoldItems` with item details and calculate `totalAmount`
     if (soldItems.length > 0) {
       for (const soldItem of soldItems) {
         const item = await Item.findById(soldItem.itemId);
@@ -24,24 +29,31 @@ exports.createReport = async (req, res) => {
         reportSoldItems.push({
           itemId: soldItem.itemId,
           quantitySold: soldItem.quantitySold,
-          total: itemTotal
+          total: itemTotal,
         });
       }
     }
 
-    // Create the new report, even if reportSoldItems is empty
-    const newReport = new Report({ soldItems: reportSoldItems, totalAmount });
+    // Create the new report
+    const newReport = new Report({ shopId, soldItems: reportSoldItems, totalAmount });
     const savedReport = await newReport.save();
+
     res.status(201).json(savedReport);
   } catch (error) {
     res.status(500).json({ message: 'Error creating report', error });
   }
 };
 
+
 // Delete an entire report and its sold items
 exports.deleteReport = async (req, res) => {
   const { reportId } = req.params;
 
+  const shopId = req.shopId; // Extracted from authMiddleware
+  if (!shopId) {
+    return res.status(400).json({ message: 'shopId is required but not provided' });
+  }
+  
   try {
     const report = await Report.findByIdAndDelete(reportId);
     if (!report) {
@@ -58,6 +70,10 @@ exports.deleteReport = async (req, res) => {
 exports.getReportByDate = async (req, res) => {
   const { date } = req.params;
 
+  const shopId = req.shopId; // Extracted from authMiddleware
+  if (!shopId) {
+    return res.status(400).json({ message: 'shopId is required but not provided' });
+  }
   try {
       // Convert the date string into a Date object
       const targetDate = new Date(date);

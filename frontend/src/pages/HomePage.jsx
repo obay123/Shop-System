@@ -1,10 +1,7 @@
+import React from 'react';
+
 const HomePage = () => {
-    return (
-      <div>
-        <h1>Welcome to the Dashboard</h1>
-      </div>
-    );
-  };
-  
-  export default HomePage;
-  
+    return <h1>Home Page</h1>;
+};
+
+export default HomePage;

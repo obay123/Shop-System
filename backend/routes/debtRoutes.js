@@ -6,6 +6,6 @@ const { addDebt, getDebts, deleteDebt,editDebt ,getDebtByName} = require('../con
 router.get('/', getDebts); // Get all debts
 router.post('/create', addDebt); // Add a new debt
 router.post('/findByName', getDebtByName);
-router.delete('delete/:id', deleteDebt); // Delete a specific debt
-router.patch('edit/:id',editDebt); //Edit a specific debt
+router.delete('/delete/:id', deleteDebt); // Delete a specific debt
+router.patch('/edit/:id',editDebt); //Edit a specific debt
 module.exports = router;

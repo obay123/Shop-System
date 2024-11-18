@@ -14,6 +14,11 @@ exports.registerShop = async (req, res) => {
         if(!email||!password){
             return res.status(404).json({message:'no email or password was provided'})
         }
+        const shopExist = await Shop.findOne({email:email})
+
+        if (shopExist) {
+            return res.status(400).json({ message: 'Email already exists' });
+        }
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -50,7 +55,7 @@ exports.loginShop = async (req, res) => {
         }
 
         // Generate JWT
-        const token = jwt.sign({ shopId: shop._id }, JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ shopId: shop._id }, JWT_SECRET, { expiresIn: '24h' });
 
         res.status(200).json({ message: 'Login successful', token });
     } catch (error) {
@@ -61,9 +66,9 @@ exports.loginShop = async (req, res) => {
 //delete shop
 
 exports.deleteShop = async (req, res) => {
-    const { shopId } = req.params; 
+    const { id } = req.params; 
     try {
-        const deletedShop = await Shop.findByIdAndDelete(shopId);
+        const deletedShop = await Shop.findByIdAndDelete(id);
 
         if (!deletedShop) {
             return res.status(404).json({ message: 'Shop not found' });
