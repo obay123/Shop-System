@@ -1,22 +1,33 @@
 const mongoose = require('mongoose');
-const soldItemSchema = require('./soldItemSchema');
 
 const reportSchema = new mongoose.Schema({
-    date: {
-        type: Date,
-        default: Date.now,
-        unique: true
+  date: {
+    type: Date,
+    required: true,
+    default: Date.now
+  },
+  totalAmount: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  soldItems: [{
+    itemId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Item',
+      required: true
     },
-    soldItems:[soldItemSchema],// Embed sold items directly
-    
-    totalAmount: {
-        type: Number,
-        default: 0
+    quantitySold: {
+      type: Number,
+      required: true,
+      default: 0
     },
-    shopId: { type: mongoose.Schema.Types.ObjectId, 
-              ref: 'Shop',
-              required: true 
-        },
+    total: {
+      type: Number,
+      required: true,
+      default: 0
+    }
+  }]
 });
 
 module.exports = mongoose.model('Report', reportSchema);

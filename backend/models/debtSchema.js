@@ -3,30 +3,36 @@ const mongoose = require("mongoose");
 const debtSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true
+    required: true,
   },
   amount: {
     type: Number,
-    required: true
+    required: true,
   },
   date: {
     type: Date,
     required: true,
-    default: Date.now
+    default: Date.now,
   },
   items: [
     {
-      itemName: { type: String, required: true },  // Stores the name of the item
-      price: { type: Number, required: true },     // Stores the price of each item
-      quantity: { type: Number, required: true }   // Stores the quantity purchased
-    }
+      itemId: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Item", 
+        required: true 
+      }, // Reference to the Item schema
+      quantity: { 
+        type: Number, 
+        required: true 
+      }, // Stores the quantity purchased
+    },
   ],
   shopId: {
-     type: mongoose.Schema.Types.ObjectId,
-      ref: 'Shop', 
-      required: true 
-    },
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Shop",
+    required: true,
+  },
 });
 
-const Debt = mongoose.model('Debt', debtSchema);
+const Debt = mongoose.model("Debt", debtSchema);
 module.exports = Debt;

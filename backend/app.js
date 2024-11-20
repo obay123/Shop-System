@@ -19,24 +19,25 @@ connectDB();
 
 //json middleware
 app.use(express.json());
-//verifyToken
+
 //use auth routes 
 app.use('/auth', authRoutes);
-//verifyToken
+
 // Use report routes
 app.use('/api/reports', verifyToken,reportRoutes);
-//verifyToken
+
 // Use sold item routes
-app.use('/api/solditems',soldItemRoutes);
-//verifyToken
+app.use('/api/solditems',verifyToken,soldItemRoutes);
+
 //use Item routes
-app.use('/api/items',ItemRoutes)
-//verifyToken
+app.use('/api/items',verifyToken,ItemRoutes)
+
 //use Debt routes
-app.use('/api/debts',debtRoutes)
-//verifyToken
+app.use('/api/debts',verifyToken,debtRoutes)
+  
 //use milk routes
-app.use('/api/milk', milkRoutes);
+app.use('/api/milk',verifyToken, milkRoutes);
+
 
 app.get('/',(req,res)=>{
   res.send('hello there')

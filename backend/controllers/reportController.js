@@ -1,5 +1,4 @@
 const Report = require('../models/reportSchema');
-const SoldItem = require('../models/soldItemSchema');
 const Item = require('../models/itemSchema');
 
 
@@ -74,21 +73,27 @@ exports.getReportByDate = async (req, res) => {
   if (!shopId) {
     return res.status(400).json({ message: 'shopId is required but not provided' });
   }
+
   try {
-      // Convert the date string into a Date object
-      const targetDate = new Date(date);
-      targetDate.setHours(0, 0, 0, 0); // Set time to the start of the day
+    // Parse the date parameter
+    const targetDate = new Date(date);
+    targetDate.setHours(0, 0, 0, 0); // Start of the day
+    const nextDate = new Date(targetDate);
+    nextDate.setDate(targetDate.getDate() + 1); // Start of the next day
 
-      // Find the report for the specified date and populate the sold items
-      const report = await Report.findOne({ date: targetDate }).populate('soldItems');
-      
-      if (!report) {
-          return res.status(404).json({ message: 'No report found for this date' });
-      }
+    // Find reports within the date range
+    const reports = await Report.find({
+      shopId,
+      date: { $gte: targetDate, $lt: nextDate }
+    });
 
-      res.status(200).json(report);
+    if (reports.length === 0) {
+      return res.status(404).json({ message: 'No report found for this date' });
+    }
+
+    res.status(200).json(reports);
   } catch (error) {
-      res.status(500).json({ message: 'Error fetching report', error });
+    res.status(500).json({ message: 'Error fetching report', error });
   }
 };
 

@@ -1,5 +1,4 @@
 const Report = require('../models/reportSchema');
-const SoldItem = require('../models/soldItemSchema');
 const Item = require('../models/itemSchema');
 
 // Add a sold item to an existing report
