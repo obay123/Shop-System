@@ -1,15 +1,15 @@
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+const getAuthToken = () => localStorage.getItem('token');
 
 const API_URL = '/api/items';
 
 export const useItemsApi = () => {
-    const { authToken } = useAuth();
 
     const getItems = async () => {
+        const token = getAuthToken()
         try {
             const response = await axios.get(API_URL, {
-                headers: { Authorization: `Bearer ${authToken}` }
+                headers: { Authorization: token }
             });
             return response.data;
         } catch (error) {

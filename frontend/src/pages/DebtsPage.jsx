@@ -1,194 +1,263 @@
 import React, { useState, useEffect } from 'react';
 import { useDebtsApi } from '../api/debtsApi';
-import Button from '../components/Button';
-import Card from '../components/Card';
-import Modal from '../components/Modals';
 import Input from '../components/Input';
 import Table from '../components/Table';
+import Button from '../components/Button';
+import Modal from '../components/Modals';
+import FormLayout from '../components/FormLayout';
 import Notification from '../components/Notification';
+import { useNavigate } from 'react-router-dom';
+import { logoutShop } from '../api/authApi'; 
+// import {getItems} from '../api/itemsApi'
 
 const DebtsPage = () => {
     const { getDebts, addDebt, updateDebt, deleteDebt } = useDebtsApi();
+    const navigate = useNavigate();
     const [debts, setDebts] = useState([]);
-    const [showModal, setShowModal] = useState(false);
-    const [modalType, setModalType] = useState('add'); // 'add' or 'edit'
-    const [notification, setNotification] = useState({ message: '', type: '' });
-    const [currentDebt, setCurrentDebt] = useState(null);
-    const [searchQuery, setSearchQuery] = useState('');
-
-    const [formData, setFormData] = useState({
+    const [search, setSearch] = useState('');
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [newDebt, setNewDebt] = useState({
         name: '',
-        amount: '',
-        items: [{ itemName: '', price: '', quantity: '' }],
+        items: [],
     });
+    const [itemOptions, setItemOptions] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [notification, setNotification] = useState({ message: '', type: '' });
+    const [selectedDebt, setSelectedDebt] = useState(null); 
+    const [showDebtDetailsModal, setShowDebtDetailsModal] = useState(false); 
 
+    // Helper function to show notifications
+    const showNotification = (message, type = 'info') => {
+        setNotification({ message, type });
+        setTimeout(() => setNotification({ message: '', type: '' }), 3000); 
+    };
+
+    // Fetch debts on page load
     useEffect(() => {
+        const fetchDebts = async () => {
+            setIsLoading(true);
+            try {
+                const data = await getDebts();
+                setDebts(data);
+            } catch (error) {
+                showNotification(error.message || 'Error fetching debts.', 'error');
+            } finally {
+                setIsLoading(false);
+            }
+        };
         fetchDebts();
     }, []);
-
-    const fetchDebts = async () => {
-        try {
-            const data = await getDebts();
-            setDebts(data);
-        } catch (error) {
-            setNotification({ message: error, type: 'error' });
-        }
-    };
+    
 
     const handleAddDebt = async () => {
         try {
-            await addDebt(formData);
-            setNotification({ message: 'Debt added successfully!', type: 'success' });
-            fetchDebts();
-            setShowModal(false);
+            await addDebt(newDebt);
+            showNotification('Debt added successfully!', 'success');
+            setShowAddModal(false);
+            setNewDebt({ name: '', items: [] });
+            const updatedDebts = await getDebts();
+            setDebts(updatedDebts);
         } catch (error) {
-            setNotification({ message: error, type: 'error' });
-        }
-    };
-
-    const handleEditDebt = async () => {
-        try {
-            await updateDebt(currentDebt._id, formData);
-            setNotification({ message: 'Debt updated successfully!', type: 'success' });
-            fetchDebts();
-            setShowModal(false);
-        } catch (error) {
-            setNotification({ message: error, type: 'error' });
+            showNotification(error || 'Error adding debt.', 'error');
         }
     };
 
     const handleDeleteDebt = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this debt?')) return;
+        if (window.confirm('Are you sure you want to delete this debt?')) {
+            try {
+                await deleteDebt(id);
+                showNotification('Debt deleted successfully!', 'success');
+                setDebts(debts.filter((debt) => debt._id !== id));
+            } catch (error) {
+                showNotification(error || 'Error deleting debt.', 'error');
+            }
+        }
+    };
+
+    const handleLogout = async () => {
         try {
-            await deleteDebt(id);
-            setNotification({ message: 'Debt deleted successfully!', type: 'success' });
-            fetchDebts();
+            await logoutShop();
+            localStorage.removeItem('token');
+            const token = localStorage.getItem('token');
+            navigate('/login');
         } catch (error) {
-            setNotification({ message: error, type: 'error' });
+            console.error('Error during logout', error);
         }
     };
 
-    const handleSearch = () => {
-        if (!searchQuery) {
-            fetchDebts();
-            return;
-        }
-        const filteredDebts = debts.filter(debt => debt.name.includes(searchQuery));
-        setDebts(filteredDebts);
-    };
-
-    const openModal = (type, debt = null) => {
-        setModalType(type);
-        if (type === 'edit') {
-            setFormData({ ...debt });
-            setCurrentDebt(debt);
-        } else {
-            setFormData({ name: '', amount: '', items: [{ itemName: '', price: '', quantity: '' }] });
-        }
-        setShowModal(true);
-    };
-
-    const closeModal = () => setShowModal(false);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleItemChange = (index, field, value) => {
-        const updatedItems = [...formData.items];
-        updatedItems[index][field] = value;
-        setFormData(prev => ({ ...prev, items: updatedItems }));
-    };
-
-    const addItem = () => {
-        setFormData(prev => ({
-            ...prev,
-            items: [...prev.items, { itemName: '', price: '', quantity: '' }],
-        }));
-    };
-
-    const removeItem = (index) => {
-        const updatedItems = formData.items.filter((_, i) => i !== index);
-        setFormData(prev => ({ ...prev, items: updatedItems }));
+    // Open the debt details modal
+    const handleShowDebtDetails = (debt) => {
+        setSelectedDebt(debt);
+        setShowDebtDetailsModal(true);
     };
 
     return (
-        <div className="debts-page">
-            <h1>Debts Management</h1>
+        <div className="debts-page" style={{ padding: '1rem' }}>
+            <h1
+                style={{
+                    fontFamily: 'Cairo, sans-serif',
+                    textAlign: 'center',
+                }}
+            >
+                إدارة الديون
+            </h1>
+            {/* <button onClick={handleLogout}>Logout</button> */}
+
+            {/* Notification Component */}
             {notification.message && (
                 <Notification message={notification.message} type={notification.type} />
             )}
-            <div className="actions">
+
+            <div style={{ marginBottom: '1rem' }}>
                 <Input
-                    placeholder="Search by name"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    label="البحث"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="ابحث باسم العميل"
                 />
-                <Button onClick={handleSearch} variant="primary">Search</Button>
-                <Button onClick={() => openModal('add')} variant="success">Add Debt</Button>
             </div>
-            <Table
-                columns={['Name', 'Amount', 'items', 'Date', 'Actions']}
-                data={debts.map(debt => ({
-                    Name: debt.name,
-                    Amount: debt.amount,
-                    Items: debt.items, // This will be handled by the Table component
-                    Date: new Date(debt.date).toLocaleDateString(),
-                    Actions: (
-                        <>
-                            <Button onClick={() => openModal('edit', debt)} variant="secondary">Edit</Button>
-                            <Button onClick={() => handleDeleteDebt(debt._id)} variant="danger">Delete</Button>
-                        </>
-                    ),
-                }))}
-            />
-            <Modal show={showModal} handleClose={closeModal}>
-                <h2>{modalType === 'add' ? 'Add New Debt' : 'Edit Debt'}</h2>
-                <Input
-                    label="Name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
+            <Button onClick={() => setShowAddModal(true)} variant="primary">
+                إضافة دين جديد
+            </Button>
+
+            {/* Debts Table */}
+            {isLoading ? (
+                <p>جاري التحميل...</p>
+            ) : (
+                <Table
+                    columns={['اسم المشتري', 'المجموع', 'الإجراءات']}
+                    data={debts
+                        .filter((debt) =>
+                            debt.name.toLowerCase().includes(search.toLowerCase())
+                        )
+                        .map((debt) => ({
+                            'اسم المشتري': debt.name,
+                            المشتريات: debt.items
+                                ?.map((item) => {
+                                    // Correctly access the name and price from itemId
+                                    const itemName = item?.itemId?.name || 'غير معروف';
+                                    const quantity = item?.quantity || 0;
+                                    const price = item?.itemId?.price || 0;
+                                    return `${itemName} (${quantity} × ${price})`;
+                                })
+                                .join(', '), // Ensure it renders as a string
+                            المجموع: debt.items?.reduce((acc, item) => {
+                                const quantity = item?.quantity || 0;
+                                const price = item?.itemId?.price || 0;
+                                return acc + quantity * price;
+                            }, 0),
+                            الإجراءات: (
+                                <>
+                                    <Button
+                                        onClick={() => handleShowDebtDetails(debt)}
+                                        variant="primary"
+                                    >
+                                        عرض التفاصيل
+                                    </Button>
+                                    <Button
+                                        onClick={() => console.log('Edit', debt._id)}
+                                        variant="secondary"
+                                    >
+                                        تعديل
+                                    </Button>
+                                    <Button
+                                        onClick={() => handleDeleteDebt(debt._id)}
+                                        variant="danger"
+                                    >
+                                        حذف
+                                    </Button>
+                                </>
+                            ),
+                        }))}
                 />
-                <Input
-                    label="Amount"
-                    name="amount"
-                    type="number"
-                    value={formData.amount}
-                    onChange={handleChange}
-                    required
-                />
-                {formData.items.map((item, index) => (
-                    <div key={index} className="item-inputs">
-                        <Input
-                            label="Item Name"
-                            value={item.itemName}
-                            onChange={(e) => handleItemChange(index, 'itemName', e.target.value)}
-                        />
-                        <Input
-                            label="Price"
-                            type="number"
-                            value={item.price}
-                            onChange={(e) => handleItemChange(index, 'price', e.target.value)}
-                        />
-                        <Input
-                            label="Quantity"
-                            type="number"
-                            value={item.quantity}
-                            onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                        />
-                        <Button variant="danger" onClick={() => removeItem(index)}>Remove</Button>
+            )}
+
+            {/* Add Debt Modal */}
+            <Modal show={showAddModal} handleClose={() => setShowAddModal(false)}>
+                <FormLayout title="إضافة دين جديد">
+                    <Input
+                        label="اسم المشتري"
+                        name="name"
+                        value={newDebt.name}
+                        onChange={(e) =>
+                            setNewDebt({ ...newDebt, name: e.target.value })
+                        }
+                        placeholder="أدخل اسم المشتري"
+                        required
+                    />
+
+                    <div>
+                        <label>اختر العناصر</label>
+                        <div>
+                            {itemOptions.map((item) => (
+                                <div key={item.itemId}>
+                                    <div>{item.itemName} (${item.price})</div>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={
+                                            newDebt.items.find((i) => i.itemId === item.itemId)?.quantity || 1
+                                        }
+                                        onChange={(e) =>
+                                            setNewDebt((prev) => ({
+                                                ...prev,
+                                                items: prev.items.map((i) =>
+                                                    i.itemId === item.itemId
+                                                        ? { ...i, quantity: parseInt(e.target.value) }
+                                                        : i
+                                                ),
+                                            }))
+                                        }
+                                    />
+                                    <Button
+                                        onClick={() =>
+                                            setNewDebt((prev) => ({
+                                                ...prev,
+                                                items: [
+                                                    ...prev.items.filter((i) => i.itemId !== item.itemId),
+                                                    { itemId: item.itemId, quantity: 1 },
+                                                ],
+                                            }))
+                                        }
+                                        variant="outline-primary"
+                                    >
+                                        إضافة {item.itemName}
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                ))}
-                <Button onClick={addItem} variant="info">Add Item</Button>
-                <Button
-                    onClick={modalType === 'add' ? handleAddDebt : handleEditDebt}
-                    variant="success"
-                >
-                    {modalType === 'add' ? 'Add Debt' : 'Update Debt'}
-                </Button>
+                    <Button onClick={handleAddDebt} variant="success">
+                        إضافة
+                    </Button>
+                </FormLayout>
+            </Modal>
+
+
+            {/* Debt Details Modal */}
+            <Modal
+                show={showDebtDetailsModal}
+                handleClose={() => setShowDebtDetailsModal(false)}
+            >
+                {selectedDebt && (
+                    <div>
+                        <h3>تفاصيل الدين</h3>
+                        <p><strong>اسم المشتري:</strong> {selectedDebt.name}</p>
+                        <h4>المشتريات</h4>
+                        <ul>
+                            {selectedDebt.items?.map((item, index) => (
+                                <li key={index}>
+                                    {item.itemId.name} (الكميات: {item.quantity}) - ${item.itemId.price}
+                                </li>
+                            ))}
+                        </ul>
+                        <p>
+                            <strong>المجموع:</strong> {selectedDebt.items?.reduce(
+                                (acc, item) => acc + item.quantity * item.itemId.price, 0
+                            )}
+                        </p>
+                    </div>
+                )}
             </Modal>
         </div>
     );

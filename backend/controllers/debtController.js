@@ -1,8 +1,6 @@
 const Debt = require("../models/debtSchema");
 const Item = require("../models/itemSchema");
 
-
-
 exports.addDebt = async (req, res) => {
   const shopId = req.shopId;
   if (!shopId) {
@@ -23,23 +21,34 @@ exports.addDebt = async (req, res) => {
 
     // Initialize total amount to 0
     let totalAmount = 0;
+    const itemsWithDetails = [];
 
-    // Loop through each item in the debt and calculate total amount
+    // Loop through each item in the debt and fetch its details from the Item model
     for (const item of items) {
       const itemData = await Item.findById(item.itemId);
       if (!itemData) {
         return res.status(404).json({ message: `Item with ID ${item.itemId} not found` });
       }
 
-      // Calculate the total cost for the item and add it to totalAmount
-      totalAmount += itemData.price * item.quantity;
+      // Calculate the total cost for the item and add it to the totalAmount
+      const itemTotal = itemData.price * item.quantity;
+      totalAmount += itemTotal;
+
+      // Push item details to the array (with item name and price)
+      itemsWithDetails.push({
+        itemId: item.itemId,
+        itemName: itemData.name,
+        price: itemData.price,
+        quantity: item.quantity,
+        total: itemTotal
+      });
     }
 
     // Create the new debt with calculated totalAmount
     const newDebt = new Debt({
       name,
       amount: totalAmount,
-      items,
+      items: itemsWithDetails,
       shopId,
     });
 
@@ -49,8 +58,6 @@ exports.addDebt = async (req, res) => {
     res.status(500).json({ message: "Error while adding debt", error });
   }
 };
-
-
 
 exports.editDebt = async (req, res) => {
   const { debtId } = req.params;
@@ -62,39 +69,19 @@ exports.editDebt = async (req, res) => {
   }
 
   try {
-    const debt = await Debt.findOne({debtId}).populate('items.itemId');
+    const debt = await Debt.findById(debtId).populate("items.itemId");
 
     // Scenario 1: Handling paid amount
     if (paidAmount) {
       if (paidAmount > debt.amount) {
         return res.status(400).json({ message: "Paid amount exceeds the total debt" });
       }
-
-      // // Deduct paid amount from total and update items
-      // let remainingAmount = paidAmount;
-
-      // for (let i = 0; i < debt.items.length; ) {
-      //   const item = debt.items[i];
-      //   const itemTotal = item.quantity * item.price;
-
-      //   if (remainingAmount >= itemTotal) {
-      //     remainingAmount -= itemTotal;
-      //     debt.items.splice(i, 1); // Remove the fully paid item
-      //   } else {
-      //     // Partially pay for the current item
-      //     const remainingQuantity = Math.ceil(remainingAmount / item.price);
-      //     debt.items[i].quantity -= remainingQuantity;
-      //     remainingAmount = 0;
-      //     break;
-      //   }
-      // }
-
       // Update the total debt amount
       debt.amount -= paidAmount;
 
       // If fully paid, delete the debt
       if (debt.amount === 0) {
-        await Debt.findOneAndDelete({debtId});
+        await Debt.findByIdAndDelete(debtId);
         return res.status(200).json({ message: "Debt fully paid and deleted" });
       }
     }
@@ -108,20 +95,18 @@ exports.editDebt = async (req, res) => {
           return res.status(404).json({ message: `Item not found: ${newItem.itemId}` });
         }
 
-        // Ensure the quantity is a valid number
-        // if (!newItem.quantity || isNaN(newItem.quantity) || newItem.quantity <= 0) {
-        //   return res.status(400).json({ message: `Invalid quantity for item: ${newItem.itemId}` });
-        // }
-
+        // Push the new item to the debt's item list
+        const itemTotal = itemDetails.price * newItem.quantity;
         debt.items.push({
           itemId: itemDetails._id,
-          name:itemDetails.name,
+          itemName: itemDetails.name,
           price: itemDetails.price,
           quantity: newItem.quantity,
+          total: itemTotal
         });
 
         // Update the total debt amount
-        debt.amount += itemDetails.price * newItem.quantity;
+        debt.amount += itemTotal;
       }
     }
     // Save the updated debt
@@ -133,12 +118,11 @@ exports.editDebt = async (req, res) => {
   }
 };
 
-
 exports.deleteDebt = async (req, res) => {
   const { id } = req.params;
-  const shopId = req.shopId
-  if(!shopId){
-    return res.status(404).json({message:"shop id is required but not provided"})
+  const shopId = req.shopId;
+  if (!shopId) {
+    return res.status(404).json({ message: "Shop ID is required but not provided" });
   }
   try {
     const deletedDebt = await Debt.findOneAndDelete({ _id: id, shopId });
@@ -152,16 +136,15 @@ exports.deleteDebt = async (req, res) => {
   }
 };
 
-
 exports.getDebtByName = async (req, res) => {
   const { name } = req.params; // Extract the name from the route parameter
-  const shopId = req.shopId
-  if(!shopId){
-    return res.status(404).json({message:"shop id is required but not provided"})
+  const shopId = req.shopId;
+  if (!shopId) {
+    return res.status(404).json({ message: "Shop ID is required but not provided" });
   }
   try {
     // Find the debt entry by name
-    const debt = await Debt.findOne({ name , shopId }).populate("items.itemId", "name price");
+    const debt = await Debt.findOne({ name, shopId }).populate("items.itemId", "name price");
     if (!debt) {
       return res.status(404).json({ message: `Debt for ${name} not found` });
     }
@@ -172,15 +155,14 @@ exports.getDebtByName = async (req, res) => {
   }
 };
 
-
 exports.getDebts = async (req, res) => {
-  const shopId = req.shopId
-  if(!shopId){
-    return res.status(404).json({message:"shop id is required but not provided"})
+  const shopId = req.shopId;
+  if (!shopId) {
+    return res.status(404).json({ message: "Shop ID is required but not provided" });
   }
   try {
     // Fetch all debts from the database
-    const debts = await Debt.find({shopId})
+    const debts = await Debt.find({ shopId })
       .populate("items.itemId", "name price") // Populate item details from Item schema
       .sort({ date: -1 }); // Optional: Sort by date (most recent first)
 

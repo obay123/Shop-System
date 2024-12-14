@@ -18,7 +18,7 @@ const LoginPage = () => {
         try {
             const response = await loginShop({ email, password });
             localStorage.setItem('token', response.data.token);
-            navigate('/Homepage'); // Redirect to dashboard
+            navigate('/debts'); 
         } catch (err) {
             setError('Invalid email or password');
         }
@@ -47,7 +47,7 @@ const LoginPage = () => {
                     id="password"
                 />
                 <Button type="submit" variant="primary" size="medium">
-                   تسجيا الدخول
+                 تسجيل الدخول
                 </Button>
             </form>
             <div

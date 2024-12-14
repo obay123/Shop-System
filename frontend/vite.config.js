@@ -14,6 +14,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false, // Use this if the backend doesn't use HTTPS
       },
+      "/auth": {
+        target: "http://localhost:5000", // Backend server URL
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });

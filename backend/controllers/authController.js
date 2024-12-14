@@ -78,3 +78,9 @@ exports.deleteShop = async (req, res) => {
         res.status(500).json({ message: 'Error deleting shop', error });
     }
 };
+
+
+
+exports.logout = (req, res) => {
+    res.status(200).json({ message: 'Logged out successfully' });
+};

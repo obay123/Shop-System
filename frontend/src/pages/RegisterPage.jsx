@@ -17,9 +17,10 @@ const RegisterPage = () => {
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
+        const shopData = { name, owner, email, password };
         e.preventDefault();
         try {
-            await registerShop({ name, owner, email, password });
+            await registerShop(shopData);
             navigate('/login'); // Redirect to login
         } catch (err) {
             setError('خطأ في محاولة انشاء الحساب') 
