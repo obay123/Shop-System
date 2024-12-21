@@ -7,10 +7,14 @@ import Modal from '../components/Modals';
 import FormLayout from '../components/FormLayout';
 import Notification from '../components/Notification';
 import { useNavigate } from 'react-router-dom';
-import { logoutShop } from '../api/authApi'; 
-// import {getItems} from '../api/itemsApi'
+import { logoutShop } from '../api/authApi';
+import EditDebtModal from '../components/EditDebtModal'
+import { useItemsApi } from '../api/itemsApi';  
+
 
 const DebtsPage = () => {
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [debtToEdit, setDebtToEdit] = useState(null);
     const { getDebts, addDebt, updateDebt, deleteDebt } = useDebtsApi();
     const navigate = useNavigate();
     const [debts, setDebts] = useState([]);
@@ -23,15 +27,30 @@ const DebtsPage = () => {
     const [itemOptions, setItemOptions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [notification, setNotification] = useState({ message: '', type: '' });
-    const [selectedDebt, setSelectedDebt] = useState(null); 
-    const [showDebtDetailsModal, setShowDebtDetailsModal] = useState(false); 
+    const [selectedDebt, setSelectedDebt] = useState(null);
+    const [showDebtDetailsModal, setShowDebtDetailsModal] = useState(false);
 
     // Helper function to show notifications
     const showNotification = (message, type = 'info') => {
         setNotification({ message, type });
-        setTimeout(() => setNotification({ message: '', type: '' }), 3000); 
+        setTimeout(() => setNotification({ message: '', type: '' }), 3000);
     };
 
+    const { getItems } = useItemsApi();
+    useEffect(() => {
+        const fetchItems = async () => {
+          try {
+            const items = await getItems()
+            setItemOptions(items); 
+            
+          } catch (error) {
+            console.error('Error fetching items:', error);
+          }
+        };
+      
+        fetchItems();
+      }, []);
+      
     // Fetch debts on page load
     useEffect(() => {
         const fetchDebts = async () => {
@@ -47,7 +66,7 @@ const DebtsPage = () => {
         };
         fetchDebts();
     }, []);
-    
+
 
     const handleAddDebt = async () => {
         try {
@@ -59,6 +78,18 @@ const DebtsPage = () => {
             setDebts(updatedDebts);
         } catch (error) {
             showNotification(error || 'Error adding debt.', 'error');
+        }
+    };
+
+    const handleUpdateDebt = async (id, updatedData) => {
+        try {
+            await updateDebt(id, updatedData);
+            showNotification('Debt updated successfully!', 'success');
+            const updatedDebts = await getDebts();
+            setDebts(updatedDebts);
+            setShowEditModal(false);
+        } catch (error) {
+            showNotification(error.message || 'Error updating debt.', 'error');
         }
     };
 
@@ -89,6 +120,12 @@ const DebtsPage = () => {
     const handleShowDebtDetails = (debt) => {
         setSelectedDebt(debt);
         setShowDebtDetailsModal(true);
+    };
+
+
+    const handleEditClick = (debt) => {
+        setDebtToEdit(debt);
+        setShowEditModal(true);
     };
 
     return (
@@ -132,15 +169,7 @@ const DebtsPage = () => {
                         )
                         .map((debt) => ({
                             'اسم المشتري': debt.name,
-                            المشتريات: debt.items
-                                ?.map((item) => {
-                                    // Correctly access the name and price from itemId
-                                    const itemName = item?.itemId?.name || 'غير معروف';
-                                    const quantity = item?.quantity || 0;
-                                    const price = item?.itemId?.price || 0;
-                                    return `${itemName} (${quantity} × ${price})`;
-                                })
-                                .join(', '), // Ensure it renders as a string
+                           
                             المجموع: debt.items?.reduce((acc, item) => {
                                 const quantity = item?.quantity || 0;
                                 const price = item?.itemId?.price || 0;
@@ -155,7 +184,7 @@ const DebtsPage = () => {
                                         عرض التفاصيل
                                     </Button>
                                     <Button
-                                        onClick={() => console.log('Edit', debt._id)}
+                                        onClick={() => handleEditClick(debt)}
                                         variant="secondary"
                                     >
                                         تعديل
@@ -259,7 +288,15 @@ const DebtsPage = () => {
                     </div>
                 )}
             </Modal>
+            <EditDebtModal
+                debt={debtToEdit}
+                show={showEditModal}
+                handleClose={() => setShowEditModal(false)}
+                onUpdate={handleUpdateDebt}
+                itemOptions={itemOptions}
+            />
         </div>
+
     );
 };
 

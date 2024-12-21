@@ -30,7 +30,7 @@ exports.addDebt = async (req, res) => {
         return res.status(404).json({ message: `Item with ID ${item.itemId} not found` });
       }
 
-      // Calculate the total cost for the item and add it to the totalAmount
+    // Calculate the total cost for the item and add it to the totalAmount
       const itemTotal = itemData.price * item.quantity;
       totalAmount += itemTotal;
 
@@ -60,63 +60,97 @@ exports.addDebt = async (req, res) => {
 };
 
 exports.editDebt = async (req, res) => {
-  const { debtId } = req.params;
-  const { paidAmount, newItems } = req.body;
+  const { id } = req.params;
+  const { paidAmount, newItems, name } = req.body; // Include name in the body
   const shopId = req.shopId;
+
+  console.log('Request params:', { id, paidAmount, newItems, name, shopId });
 
   if (!shopId) {
     return res.status(404).json({ message: "Shop ID is required but not provided" });
   }
 
   try {
-    const debt = await Debt.findById(debtId).populate("items.itemId");
+    const debt = await Debt.findById(id);
+    if (!debt) {
+      return res.status(404).json({ message: "Debt not found" });
+    }
 
-    // Scenario 1: Handling paid amount
+    if (debt.shopId.toString() !== shopId.toString()) {
+      return res.status(403).json({ message: "Not authorized to edit this debt" });
+    }
+
+    // Handle name update
+    if (name) {
+      debt.name = name;  // Update the name if it's provided
+    }
+
+    // Handle paid amount update
     if (paidAmount) {
       if (paidAmount > debt.amount) {
         return res.status(400).json({ message: "Paid amount exceeds the total debt" });
       }
-      // Update the total debt amount
       debt.amount -= paidAmount;
 
-      // If fully paid, delete the debt
       if (debt.amount === 0) {
-        await Debt.findByIdAndDelete(debtId);
+        await Debt.findByIdAndDelete(id);
         return res.status(200).json({ message: "Debt fully paid and deleted" });
       }
     }
 
-    // Scenario 2: Adding new items
+    // Add new items to debt
     if (newItems && newItems.length > 0) {
       for (const newItem of newItems) {
-        const itemDetails = await Item.findById(newItem.itemId);
-
-        if (!itemDetails) {
-          return res.status(404).json({ message: `Item not found: ${newItem.itemId}` });
+        if (!newItem.itemId || !newItem.quantity) {
+          return res.status(400).json({ 
+            message: "Each item must have both itemId and quantity",
+            invalidItem: newItem 
+          });
         }
 
-        // Push the new item to the debt's item list
-        const itemTotal = itemDetails.price * newItem.quantity;
-        debt.items.push({
-          itemId: itemDetails._id,
-          itemName: itemDetails.name,
-          price: itemDetails.price,
-          quantity: newItem.quantity,
-          total: itemTotal
-        });
+        try {
+          const itemDetails = await Item.findById(newItem.itemId);
+          if (!itemDetails) {
+            return res.status(404).json({ 
+              message: `Item not found: ${newItem.itemId}` 
+            });
+          }
 
-        // Update the total debt amount
-        debt.amount += itemTotal;
+          if (itemDetails.shopId.toString() !== shopId.toString()) {
+            return res.status(403).json({ 
+              message: `Item ${newItem.itemId} does not belong to this shop` 
+            });
+          }
+
+          const itemTotal = itemDetails.price * newItem.quantity;
+          debt.items.push({
+            itemId: itemDetails._id,
+            quantity: newItem.quantity
+          });
+
+          debt.amount += itemTotal;
+        } catch (itemError) {
+          return res.status(400).json({ 
+            message: "Invalid item ID format", 
+            itemId: newItem.itemId 
+          });
+        }
       }
     }
-    // Save the updated debt
+
     const updatedDebt = await debt.save();
-    res.status(200).json(updatedDebt);
+    const populatedDebt = await Debt.findById(updatedDebt._id).populate('items.itemId');
+    res.status(200).json(populatedDebt);
 
   } catch (error) {
-    res.status(500).json({ message: "Error updating debt", error });
+    console.error('Error in editDebt:', error);
+    res.status(500).json({ 
+      message: "Error updating debt", 
+      error: error.message,
+    });
   }
 };
+
 
 exports.deleteDebt = async (req, res) => {
   const { id } = req.params;

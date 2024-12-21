@@ -1,12 +1,12 @@
 import axios from 'axios';
-const getAuthToken = () => localStorage.getItem('token');
 
 const API_URL = '/api/items';
 
 export const useItemsApi = () => {
+    const getAuthToken = () => localStorage.getItem('token');
 
     const getItems = async () => {
-        const token = getAuthToken()
+        const token = getAuthToken();
         try {
             const response = await axios.get(API_URL, {
                 headers: { Authorization: token }
@@ -18,9 +18,10 @@ export const useItemsApi = () => {
     };
 
     const addItem = async (itemData) => {
+        const token = getAuthToken();
         try {
             const response = await axios.post(`${API_URL}/create`, itemData, {
-                headers: { Authorization: `Bearer ${authToken}` }
+                headers: { Authorization: token }
             });
             return response.data;
         } catch (error) {
@@ -29,9 +30,10 @@ export const useItemsApi = () => {
     };
 
     const updateItem = async (id, itemData) => {
+        const token = getAuthToken();
         try {
             const response = await axios.patch(`${API_URL}/edit/${id}`, itemData, {
-                headers: { Authorization: `Bearer ${authToken}` }
+                headers: { Authorization: token }
             });
             return response.data;
         } catch (error) {
@@ -40,9 +42,10 @@ export const useItemsApi = () => {
     };
 
     const deleteItem = async (id) => {
+        const token = getAuthToken();
         try {
             const response = await axios.delete(`${API_URL}/delete/${id}`, {
-                headers: { Authorization: `Bearer ${authToken}` }
+                headers: { Authorization: token }
             });
             return response.data;
         } catch (error) {
