@@ -204,7 +204,7 @@ exports.getDebts = async (req, res) => {
 
     // If no debts are found
     if (!debts || debts.length === 0) {
-      return res.status(404).json({ message: "No debts found" });
+      return res.status(404).json({ message: "لم يتم العثور على دين" });
     }
 
     // Return the debts

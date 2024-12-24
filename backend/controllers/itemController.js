@@ -11,7 +11,7 @@ exports.getItems = async (req, res) => {
     }
     const items = await Item.find()
     if (items.length === 0) {
-      return res.status(404).json({ message: "no items found" })
+      return res.status(404).json({ message: "لم يتم العثور على اي عناصر" })
     }
     res.status(200).json(items)
   } catch (error) {

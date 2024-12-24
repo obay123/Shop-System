@@ -55,8 +55,9 @@ const DebtsPage = () => {
             try {
                 const data = await getDebts();
                 setDebts(data);
+                showNotification('تم جلب الديون بنجاح','success')
             } catch (error) {
-                showNotification(error.message || 'خطأ في جلب الديون', 'error');
+                showNotification(error.message || 'خطأ في جلب الديون', 'info');
             } finally {
                 setIsLoading(false);
             }
@@ -312,15 +313,15 @@ const DebtsPage = () => {
                             )}
                         </p>
                         <p>
-                            <strong>المجموع بعد الدفع :</strong>
-                            {selectedDebt.amount || 0}
-                        </p>
-                        <p>
                             <strong> القيمة المدفوعة: </strong>
                             {selectedDebt.items.reduce(
                                 (acc, item) => acc + item.quantity * item.itemId.price,
                                 0
                             ) - selectedDebt.amount}
+                        </p>
+                        <p>
+                            <strong>المجموع بعد الدفع :</strong>
+                            {selectedDebt.amount || 0}
                         </p>
                     </div>
                 )}

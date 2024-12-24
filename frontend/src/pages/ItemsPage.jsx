@@ -9,15 +9,18 @@ import Table from '../components/Table';
 
 const ItemsPage = () => {
     const { getItems, addItem, updateItem, deleteItem } = useItemsApi();
-
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
     const [showModal, setShowModal] = useState(false);
-    const [newItem, setNewItem] = useState({ name: '', price: '', quantity: '' });
-
+    const [newItem, setNewItem] = useState({ name: '', price: '' });
     const [editingItem, setEditingItem] = useState(null);
-    const [successMessage, setSuccessMessage] = useState('');
+    const [notification, setNotification] = useState({ message: '', type: '' });
+  
+
+    const showNotification = (message, type = 'info') => {
+        setNotification({ message, type });
+        setTimeout(() => setNotification({ message: '', type: '' }), 3000);
+    };
 
     // Fetch items on load
     useEffect(() => {
@@ -25,13 +28,14 @@ const ItemsPage = () => {
             try {
                 const data = await getItems();
                 setItems(data);
-                setLoading(false);
-            } catch (err) {
-                setError(err);
+                console.log(data)
+                showNotification('تم جلب السلع بنجاح', 'success')
+            } catch (error) {
+                showNotification(error.message || 'خطأ في جلب السلع','info')
+            } finally {
                 setLoading(false);
             }
         };
-
         fetchItems();
     }, []);
 
@@ -44,17 +48,17 @@ const ItemsPage = () => {
         try {
             const addedItem = await addItem(newItem);
             setItems([...items, addedItem]);
-            setNewItem({ name: '', price: '', quantity: '' });
+            setNewItem({ name: '', price: '' });
             setShowModal(false);
-            setSuccessMessage('Item added successfully!');
-        } catch (err) {
-            setError(err);
+           showNotification('تم اضافة العنصر بنجاح','success')
+        } catch (error) {
+            showNotification(error.message || 'خطأ في اضافة العنصر','error')
         }
     };
 
     const handleEditItem = (item) => {
         setEditingItem(item);
-        setNewItem({ name: item.name, price: item.price, quantity: item.quantity });
+        setNewItem({ name: item.name, price: item.price });
         setShowModal(true);
     };
 
@@ -65,45 +69,47 @@ const ItemsPage = () => {
             setEditingItem(null);
             setNewItem({ name: '', price: '', quantity: '' });
             setShowModal(false);
-            setSuccessMessage('Item updated successfully!');
-        } catch (err) {
-            setError(err);
+            showNotification('تم تحديث العنصر بنجاح','success')
+        } catch (error) {
+            showNotification(error.message || 'خطأ في تحديث العنصر','error')
         }
     };
 
     const handleDeleteItem = async (id) => {
+        if (window.confirm('هل تريد بالفعل في مسح العنصر ؟')) {
         try {
             await deleteItem(id);
             setItems(items.filter((item) => item._id !== id));
-            setSuccessMessage('Item deleted successfully!');
-        } catch (err) {
-            setError(err);
+            showNotification('تم حذف العنصر بنجاح','success')
+        } catch (error) {
+            showNotification(error.message || 'خطأ في حذف العنصر','error')
         }
+    }
     };
 
     const closeModal = () => {
         setShowModal(false);
-        setNewItem({ name: '', price: '', quantity: '' });
+        setNewItem({ name: '', price: '' });
         setEditingItem(null);
     };
 
     return (
+
         <div className="items-page">
-        
+
             <h1 style={{ fontFamily: 'Cairo, sans-serif', textAlign: 'center' }}>إدارة العناصر</h1>
             {loading && <Notification message="جارٍ تحميل البيانات..." type="info" />}
-            {error && <Notification message={error} type="error" />}
-            {successMessage && <Notification message={successMessage} type="success" />}
-            
+            {notification.message &&
+                (<Notification message={notification.message} type={notification.type} />)}
+
             <Button onClick={() => setShowModal(true)}>إضافة عنصر جديد</Button>
-            
+
             <Table
-                columns={['الاسم', 'السعر', 'الكمية', 'الإجراءات']}
+                columns={['الاسم', 'السعر', 'الإجراءات']}
                 data={items.map((item) => ({
-                    name: item.name,
-                    price: item.price,
-                    quantity: item.quantity,
-                    actions: (
+                    الاسم: item.name,
+                    السعر: item.price,
+                    الإجراءات: (
                         <>
                             <Button variant="secondary" onClick={() => handleEditItem(item)}>تعديل</Button>
                             <Button variant="danger" onClick={() => handleDeleteItem(item._id)}>حذف</Button>
@@ -118,7 +124,12 @@ const ItemsPage = () => {
                     label="الاسم"
                     name="name"
                     value={newItem.name}
-                    onChange={handleInputChange}
+                    onChange={(e) =>
+                        setNewItem((prev) => ({
+                            ...prev,
+                            name: e.target.value,
+                        }))
+                    }
                     required
                 />
                 <Input
@@ -126,15 +137,12 @@ const ItemsPage = () => {
                     name="price"
                     type="number"
                     value={newItem.price}
-                    onChange={handleInputChange}
-                    required
-                />
-                <Input
-                    label="الكمية"
-                    name="quantity"
-                    type="number"
-                    value={newItem.quantity}
-                    onChange={handleInputChange}
+                    onChange={(e) =>
+                        setNewItem((prev) => ({
+                            ...prev,
+                            price: e.target.value,
+                        }))
+                    }
                     required
                 />
                 <Button

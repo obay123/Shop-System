@@ -4,7 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import HomePage from './pages/HomePage';
 import DebtsPage from './pages/DebtsPage';
 import ItemPage from './pages/ItemsPage';
-// import ReportsPage from './pages/ReportsPage';
+import ReportsPage from './pages/ReportsPage';
 import RegisterPage from './pages/RegisterPage';
  import LoginPage from './pages/LoginPage.jsx';
 // import NotFoundPage from './pages/NotFoundPage.jsx';
@@ -20,8 +20,8 @@ const App = () => {
                     <Route path="/items" element={<ItemPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
-                    {/*<Route path="/reports" element={<ReportsPage />} />
-                    <Route path="*" element={<NotFoundPage />} /> */}
+                    <Route path="/reports" element={<ReportsPage />} />
+                    {/* <Route path="*" element={<NotFoundPage />} /> */}
                 </Routes>
             </AuthProvider>
         </div>
