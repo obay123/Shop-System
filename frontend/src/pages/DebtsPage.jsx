@@ -8,7 +8,7 @@ import FormLayout from '../components/FormLayout';
 import Notification from '../components/Notification';
 import { useNavigate } from 'react-router-dom';
 import { logoutShop } from '../api/authApi';
-import EditDebtModal from '../components/EditDebtModal';
+import UpdateDebtModal from '../components/updateDebtModal';
 import { useItemsApi } from '../api/itemsApi';
 
 const DebtsPage = () => {
@@ -326,7 +326,7 @@ const DebtsPage = () => {
                 )}
             </Modal>
 
-            <EditDebtModal
+            <UpdateDebtModal
                 debt={debtToEdit}
                 show={showEditModal}
                 handleClose={() => setShowEditModal(false)}
