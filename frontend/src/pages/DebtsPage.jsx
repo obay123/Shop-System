@@ -8,9 +8,8 @@ import FormLayout from '../components/FormLayout';
 import Notification from '../components/Notification';
 import { useNavigate } from 'react-router-dom';
 import { logoutShop } from '../api/authApi';
-import EditDebtModal from '../components/EditDebtModal'
-import { useItemsApi } from '../api/itemsApi';  
-
+import EditDebtModal from '../components/EditDebtModal';
+import { useItemsApi } from '../api/itemsApi';
 
 const DebtsPage = () => {
     const [showEditModal, setShowEditModal] = useState(false);
@@ -30,28 +29,26 @@ const DebtsPage = () => {
     const [selectedDebt, setSelectedDebt] = useState(null);
     const [showDebtDetailsModal, setShowDebtDetailsModal] = useState(false);
 
-    // Helper function to show notifications
     const showNotification = (message, type = 'info') => {
         setNotification({ message, type });
         setTimeout(() => setNotification({ message: '', type: '' }), 3000);
     };
 
     const { getItems } = useItemsApi();
+
     useEffect(() => {
         const fetchItems = async () => {
-          try {
-            const items = await getItems()
-            setItemOptions(items); 
-            
-          } catch (error) {
-            console.error('Error fetching items:', error);
-          }
+            try {
+                const items = await getItems();
+                setItemOptions(items);
+            } catch (error) {
+                console.error('Error fetching items:', error);
+                showNotification('خطأ في جلب السلع', 'error');
+            }
         };
-      
         fetchItems();
-      }, []);
-      
-    // Fetch debts on page load
+    }, []);
+
     useEffect(() => {
         const fetchDebts = async () => {
             setIsLoading(true);
@@ -59,7 +56,7 @@ const DebtsPage = () => {
                 const data = await getDebts();
                 setDebts(data);
             } catch (error) {
-                showNotification(error.message || 'Error fetching debts.', 'error');
+                showNotification(error.message || 'خطأ في جلب الديون', 'error');
             } finally {
                 setIsLoading(false);
             }
@@ -67,61 +64,101 @@ const DebtsPage = () => {
         fetchDebts();
     }, []);
 
+    const handleItemSelect = (itemId) => {
+        const selectedItem = itemOptions.find((item) => item._id === itemId);
+        if (selectedItem) {
+            setNewDebt((prev) => ({
+                ...prev,
+                items: [
+                    ...prev.items,
+                    {
+                        itemId: itemId,
+                        quantity: 1,
+                        _itemName: selectedItem.name
+                    }
+                ],
+            }));
+        }
+    };
 
-    const handleAddDebt = async () => {
+    const handleItemQuantityChange = (index, quantity) => {
+        const updatedItems = newDebt.items.map((item, i) =>
+            i === index ? { ...item, quantity } : item
+        );
+        setNewDebt((prev) => ({
+            ...prev,
+            items: updatedItems,
+        }));
+    };
+
+    const handleAddDebt = async (e) => {
+        e.preventDefault();
+        if (!newDebt.name || newDebt.items.length === 0) {
+            showNotification('املأ جميع الحقول', 'error');
+            return;
+        }
+
+        const debtToAdd = {
+            name: newDebt.name,
+            items: newDebt.items.map(item => ({
+                itemId: item.itemId,
+                quantity: item.quantity
+            }))
+        };
+
         try {
-            await addDebt(newDebt);
-            showNotification('Debt added successfully!', 'success');
+            await addDebt(debtToAdd);
+            showNotification('تم اضافة الدين بنجاح !', 'success');
             setShowAddModal(false);
-            setNewDebt({ name: '', items: [] });
+            setNewDebt({
+                name: '',
+                items: [],
+            });
             const updatedDebts = await getDebts();
             setDebts(updatedDebts);
         } catch (error) {
-            showNotification(error || 'Error adding debt.', 'error');
+            showNotification(error.message || 'خطأ في اضافة الدين', 'error');
         }
     };
 
     const handleUpdateDebt = async (id, updatedData) => {
         try {
             await updateDebt(id, updatedData);
-            showNotification('Debt updated successfully!', 'success');
+            showNotification('تم تحديث الدين بنجاح !', 'success');
             const updatedDebts = await getDebts();
             setDebts(updatedDebts);
             setShowEditModal(false);
         } catch (error) {
-            showNotification(error.message || 'Error updating debt.', 'error');
+            showNotification(error.message || 'خطأ في تحديث الدين', 'error');
         }
     };
 
     const handleDeleteDebt = async (id) => {
-        if (window.confirm('Are you sure you want to delete this debt?')) {
+        if (window.confirm('هل تريد بالفعل في مسح الدين ؟')) {
             try {
                 await deleteDebt(id);
-                showNotification('Debt deleted successfully!', 'success');
+                showNotification('!تم مسح الدين بنجاح', 'success');
                 setDebts(debts.filter((debt) => debt._id !== id));
             } catch (error) {
-                showNotification(error || 'Error deleting debt.', 'error');
+                showNotification(error.message || 'خطأ في مسح الدين ', 'error');
             }
         }
     };
 
-    const handleLogout = async () => {
-        try {
-            await logoutShop();
-            localStorage.removeItem('token');
-            const token = localStorage.getItem('token');
-            navigate('/login');
-        } catch (error) {
-            console.error('Error during logout', error);
-        }
-    };
+    // const handleLogout = async () => {
+    //     try {
+    //         await logoutShop();
+    //         localStorage.removeItem('token');
+    //         navigate('/login');
+    //     } catch (error) {
+    //         console.error('Error during logout', error);
+    //     }
+    // };
 
-    // Open the debt details modal
     const handleShowDebtDetails = (debt) => {
         setSelectedDebt(debt);
         setShowDebtDetailsModal(true);
     };
-
 
     const handleEditClick = (debt) => {
         setDebtToEdit(debt);
@@ -130,17 +167,10 @@ const DebtsPage = () => {
 
     return (
         <div className="debts-page" style={{ padding: '1rem' }}>
-            <h1
-                style={{
-                    fontFamily: 'Cairo, sans-serif',
-                    textAlign: 'center',
-                }}
-            >
+            <h1 style={{ fontFamily: 'Cairo, sans-serif', textAlign: 'center' }}>
                 إدارة الديون
             </h1>
-            {/* <button onClick={handleLogout}>Logout</button> */}
 
-            {/* Notification Component */}
             {notification.message && (
                 <Notification message={notification.message} type={notification.type} />
             )}
@@ -153,11 +183,11 @@ const DebtsPage = () => {
                     placeholder="ابحث باسم العميل"
                 />
             </div>
+
             <Button onClick={() => setShowAddModal(true)} variant="primary">
                 إضافة دين جديد
             </Button>
 
-            {/* Debts Table */}
             {isLoading ? (
                 <p>جاري التحميل...</p>
             ) : (
@@ -168,40 +198,38 @@ const DebtsPage = () => {
                             debt.name.toLowerCase().includes(search.toLowerCase())
                         )
                         .map((debt) => ({
+                            id: debt._id,
                             'اسم المشتري': debt.name,
-                           
-                            المجموع: debt.items?.reduce((acc, item) => {
-                                const quantity = item?.quantity || 0;
-                                const price = item?.itemId?.price || 0;
-                                return acc + quantity * price;
-                            }, 0),
-                            الإجراءات: (
-                                <>
+                            'المجموع': debt.amount,
+                            'الإجراءات': (
+                                <div key={`actions-${debt._id}`}>
                                     <Button
+                                        key={`details-${debt._id}`}
                                         onClick={() => handleShowDebtDetails(debt)}
                                         variant="primary"
                                     >
                                         عرض التفاصيل
                                     </Button>
                                     <Button
+                                        key={`edit-${debt._id}`}
                                         onClick={() => handleEditClick(debt)}
                                         variant="secondary"
                                     >
                                         تعديل
                                     </Button>
                                     <Button
+                                        key={`delete-${debt._id}`}
                                         onClick={() => handleDeleteDebt(debt._id)}
                                         variant="danger"
                                     >
                                         حذف
                                     </Button>
-                                </>
+                                </div>
                             ),
                         }))}
                 />
             )}
 
-            {/* Add Debt Modal */}
             <Modal show={showAddModal} handleClose={() => setShowAddModal(false)}>
                 <FormLayout title="إضافة دين جديد">
                     <Input
@@ -209,7 +237,10 @@ const DebtsPage = () => {
                         name="name"
                         value={newDebt.name}
                         onChange={(e) =>
-                            setNewDebt({ ...newDebt, name: e.target.value })
+                            setNewDebt((prev) => ({
+                                ...prev,
+                                name: e.target.value,
+                            }))
                         }
                         placeholder="أدخل اسم المشتري"
                         required
@@ -217,53 +248,44 @@ const DebtsPage = () => {
 
                     <div>
                         <label>اختر العناصر</label>
-                        <div>
+                        <select
+                            onChange={(e) => handleItemSelect(e.target.value)}
+                            defaultValue=""
+                        >
+                            <option value="" disabled>
+                                اختار السلع
+                            </option>
                             {itemOptions.map((item) => (
-                                <div key={item.itemId}>
-                                    <div>{item.itemName} (${item.price})</div>
+                                <option key={item._id} value={item._id}>
+                                    {item.name} (السعر: {item.price})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {newDebt.items.length > 0 && (
+                        <div>
+                            <h4>العناصر التي اخترتها</h4>
+                            {newDebt.items.map((item, index) => (
+                                <div key={index}>
+                                    <p>{item._itemName}</p>
+                                    <label>الكمية:</label>
                                     <input
                                         type="number"
-                                        min="1"
-                                        value={
-                                            newDebt.items.find((i) => i.itemId === item.itemId)?.quantity || 1
-                                        }
+                                        value={item.quantity}
                                         onChange={(e) =>
-                                            setNewDebt((prev) => ({
-                                                ...prev,
-                                                items: prev.items.map((i) =>
-                                                    i.itemId === item.itemId
-                                                        ? { ...i, quantity: parseInt(e.target.value) }
-                                                        : i
-                                                ),
-                                            }))
+                                            handleItemQuantityChange(index, e.target.value)
                                         }
+                                        required
                                     />
-                                    <Button
-                                        onClick={() =>
-                                            setNewDebt((prev) => ({
-                                                ...prev,
-                                                items: [
-                                                    ...prev.items.filter((i) => i.itemId !== item.itemId),
-                                                    { itemId: item.itemId, quantity: 1 },
-                                                ],
-                                            }))
-                                        }
-                                        variant="outline-primary"
-                                    >
-                                        إضافة {item.itemName}
-                                    </Button>
                                 </div>
                             ))}
                         </div>
-                    </div>
-                    <Button onClick={handleAddDebt} variant="success">
-                        إضافة
-                    </Button>
+                    )}
+                    <button type="submit" onClick={handleAddDebt}>اضافة</button>
                 </FormLayout>
             </Modal>
 
-
-            {/* Debt Details Modal */}
             <Modal
                 show={showDebtDetailsModal}
                 handleClose={() => setShowDebtDetailsModal(false)}
@@ -271,23 +293,39 @@ const DebtsPage = () => {
                 {selectedDebt && (
                     <div>
                         <h3>تفاصيل الدين</h3>
-                        <p><strong>اسم المشتري:</strong> {selectedDebt.name}</p>
+                        <p>
+                            <strong>اسم المشتري:</strong> {selectedDebt.name}
+                        </p>
                         <h4>المشتريات</h4>
                         <ul>
-                            {selectedDebt.items?.map((item, index) => (
-                                <li key={index}>
+                            {selectedDebt.items?.map((item) => (
+                                <li key={`detail-${item.itemId._id}-${item.quantity}`}>
                                     {item.itemId.name} (الكميات: {item.quantity}) - ${item.itemId.price}
                                 </li>
                             ))}
                         </ul>
                         <p>
-                            <strong>المجموع:</strong> {selectedDebt.items?.reduce(
-                                (acc, item) => acc + item.quantity * item.itemId.price, 0
+                            <strong>المجموع:</strong>{' '}
+                            {selectedDebt.items?.reduce(
+                                (acc, item) => acc + item.quantity * item.itemId.price,
+                                0
                             )}
+                        </p>
+                        <p>
+                            <strong>المجموع بعد الدفع :</strong>
+                            {selectedDebt.amount || 0}
+                        </p>
+                        <p>
+                            <strong> القيمة المدفوعة: </strong>
+                            {selectedDebt.items.reduce(
+                                (acc, item) => acc + item.quantity * item.itemId.price,
+                                0
+                            ) - selectedDebt.amount}
                         </p>
                     </div>
                 )}
             </Modal>
+
             <EditDebtModal
                 debt={debtToEdit}
                 show={showEditModal}
@@ -296,7 +334,6 @@ const DebtsPage = () => {
                 itemOptions={itemOptions}
             />
         </div>
-
     );
 };
 

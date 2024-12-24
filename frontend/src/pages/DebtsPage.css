@@ -26,3 +26,39 @@ th {
 .items-details h4 {
     margin: 0 0 10px;
 }
+
+.items-container {
+    margin: 1rem 0;
+}
+
+.items-label {
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.item-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.item-name {
+    flex: 1;
+}
+
+.item-quantity {
+    width: 80px;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}

@@ -9,7 +9,6 @@ const itemSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    image: String,
 
     shopId: { 
         type: mongoose.Schema.Types.ObjectId,

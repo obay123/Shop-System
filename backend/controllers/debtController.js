@@ -6,10 +6,12 @@ exports.addDebt = async (req, res) => {
   if (!shopId) {
     return res.status(404).json({ message: "Shop ID is required but not provided" });
   }
-
+    
   try {
     let { name, items } = req.body;
-
+    if(!name){
+      return res.status(404).josn({message:"name is not provided"})
+    }
     // Normalize the name: trim and replace multiple spaces with a single space
     name = name.trim().replace(/\s+/g, " ");
 

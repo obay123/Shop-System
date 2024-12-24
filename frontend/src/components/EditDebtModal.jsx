@@ -15,27 +15,18 @@ const EditDebtModal = ({ debt, show, handleClose, onUpdate, itemOptions }) => {
     if (debt) {
       setEditedDebt({
         name: debt.name,
-        items: debt.items.map(item => ({
-          itemId: item.itemId._id,
-          quantity: item.quantity
-        })),
         paidAmount: 0
       });
     }
   }, [debt]);
 
-  useEffect(() => {
-    console.log('ItemOptions:', itemOptions);
-  }, [itemOptions]);
 
   const handleSubmit = async () => {
     try {
       const dataToSend = {
         name: editedDebt.name,
         paidAmount: editedDebt.paidAmount,
-        newItems: editedDebt.items.filter(item =>
-          !debt.items.some(existingItem => existingItem.itemId._id === item.itemId)
-        )
+        newItems: editedDebt.items 
       };
       await onUpdate(debt._id, dataToSend);
       handleClose();
@@ -62,6 +53,62 @@ const EditDebtModal = ({ debt, show, handleClose, onUpdate, itemOptions }) => {
   };
 
   if (!show || !debt) return null;
+  const handleItemSelect = (itemId) => {
+    const selectedItem = itemOptions.find((item) => item._id === itemId);
+    if (selectedItem) {
+      setEditedDebt((prev) => ({
+            ...prev,
+            items: [
+                ...prev.items,
+                {
+                    itemId: itemId,
+                    quantity: 1,
+                    _itemName: selectedItem.name
+                }
+            ],
+        }));
+    }
+};
+
+const handleItemQuantityChange = (index, quantity) => {
+    const updatedItems = editedDebt.items.map((item, i) =>
+        i === index ? { ...item, quantity } : item
+    );
+    setEditedDebt((prev) => ({
+        ...prev,
+        items: updatedItems,
+    }));
+};
+
+const handleAddDebt = async (e) => {
+    e.preventDefault();
+    if (!editedDebt.name || editedDebt.items.length === 0) {
+        showNotification('املأ جميع الحقول', 'error');
+        return;
+    }
+
+    const debtToAdd = {
+        name: editedDebt.name,
+        items: editedDebt.items.map(item => ({
+            itemId: item.itemId,
+            quantity: item.quantity
+        }))
+    };
+
+    try {
+        await addDebt(debtToAdd);
+        showNotification('تم اضافة الدين بنجاح !', 'success');
+        setShowAddModal(false);
+        setEditedDebt({
+            name: '',
+            items: [],
+        });
+        const updatedDebts = await getDebts();
+        setDebts(updatedDebts);
+    } catch (error) {
+        showNotification(error.message || 'خطأ في اضافة الدين', 'error');
+    }
+};
 
   return (
     <Modal show={show} handleClose={handleClose}>
@@ -85,25 +132,47 @@ const EditDebtModal = ({ debt, show, handleClose, onUpdate, itemOptions }) => {
           min="0"
         />
 
-        <div className="mt-4">
-          <label className="block text-sm font-medium mb-2">إضافة عناصر جديدة</label>
-          <div className="space-y-2">
-            {Array.isArray(itemOptions) && itemOptions.map((item) => (
-              <div key={item._id} className="flex items-center space-x-2">
-                <span className="ml-2">{item.name} (${item.price})</span>
-                <input
-                  type="number"
-                  min="0"
-                  className="w-20 p-1 border rounded"
-                  value={editedDebt.items.find(i => i.itemId === item._id)?.quantity || 0}
-                  onChange={(e) => handleQuantityChange(item._id, parseInt(e.target.value) || 0)}
-                />
-              </div>
-            ))}
-          </div>
+        <div>
+          <label>إضافة عناصر جديدة</label>
+          <div>
+                        <label>اختر العناصر</label>
+                        <select
+                            onChange={(e) => handleItemSelect(e.target.value)}
+                            defaultValue=""
+                        >
+                            <option value="" disabled>
+                                اختار السلع
+                            </option>
+                            {itemOptions.map((item) => (
+                                <option key={item._id} value={item._id}>
+                                    {item.name} (السعر: {item.price})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {editedDebt.items.length > 0 && (
+                        <div>
+                            <h4>العناصر التي اخترتها</h4>
+                            {editedDebt.items.map((item, index) => (
+                                <div key={index}>
+                                    <p>{item._itemName}</p>
+                                    <label>الكمية:</label>
+                                    <input
+                                        type="number"
+                                        value={item.quantity}
+                                        onChange={(e) =>
+                                            handleItemQuantityChange(index, e.target.value)
+                                        }
+                                        required
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    )}
         </div>
 
-        <div className="mt-4 flex justify-end space-x-2">
+        <div>
           <Button onClick={handleClose} variant="secondary">
             إلغاء
           </Button>
