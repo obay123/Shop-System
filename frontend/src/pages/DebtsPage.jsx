@@ -167,27 +167,24 @@ const DebtsPage = () => {
     };
 
     return (
-        <div className="debts-page" style={{ padding: '1rem' }}>
-            <h1 style={{ fontFamily: 'Cairo, sans-serif', textAlign: 'center' }}>
-                إدارة الديون
-            </h1>
-
+        <div className="page-container">
+        <div className="page-header">
+            <h1 className="page-title">إدارة الديون</h1>
+            <div className="header-actions">
+            <Input 
+                    placeholder="ابحث باسم العميل"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="search-input"
+                />
+                <Button onClick={() => setShowAddModal(true)} className="add-button">
+                    إضافة عنصر جديد
+                </Button>
+            </div>
+        </div>
             {notification.message && (
                 <Notification message={notification.message} type={notification.type} />
             )}
-
-            <div style={{ marginBottom: '1rem' }}>
-                <Input
-                    label="البحث"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="ابحث باسم العميل"
-                />
-            </div>
-
-            <Button onClick={() => setShowAddModal(true)} variant="primary">
-                إضافة دين جديد
-            </Button>
 
             {isLoading ? (
                 <p>جاري التحميل...</p>
@@ -209,7 +206,7 @@ const DebtsPage = () => {
                                         onClick={() => handleShowDebtDetails(debt)}
                                         variant="primary"
                                     >
-                                        عرض التفاصيل
+                                         التفاصيل
                                     </Button>
                                     <Button
                                         key={`edit-${debt._id}`}

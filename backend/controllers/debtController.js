@@ -18,7 +18,7 @@ exports.addDebt = async (req, res) => {
     // Check if a debt with the same name already exists in the database for this shop
     const existingDebt = await Debt.findOne({ name, shopId });
     if (existingDebt) {
-      return res.status(400).json({ message: `A debt with the name "${name}" already exists for this shop` });
+      return res.status(400).json({ message: `${name} موجود في قائمة الديون`});
     }
 
     // Initialize total amount to 0
