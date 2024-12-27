@@ -2,6 +2,8 @@ const Report = require('../models/reportSchema');
 const Item = require('../models/itemSchema');
 
 
+
+
 exports.createReport = async (req, res) => {
   try {
     const { soldItems = [] } = req.body; // Default to an empty array if soldItems is undefined
@@ -64,6 +66,22 @@ exports.deleteReport = async (req, res) => {
     res.status(500).json({ message: 'Error deleting report', error });
   }
 };
+
+exports.getReports = async (req,res) => {
+  const shopId = req.shopId; // Extracted from authMiddleware
+  if (!shopId) {
+    return res.status(400).json({ message: 'shopId is required but not provided' });
+  }
+  try{
+    const reports = await Report.find()
+    if (reports.length === 0) {
+      return res.status(404).json({ message: "لم يتم العثور على تقارير" })
+    }
+    res.status(200).json(reports)
+  }catch(error){
+    return res.status(500).json({message: error.message || 'خطأ في جلب التقارير'})
+  }
+}
 
 // Get a report by date
 exports.getReportByDate = async (req, res) => {

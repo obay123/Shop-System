@@ -1,15 +1,16 @@
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+
 
 const API_URL = '/api/soldItems';
 
 export const useSoldItemsApi = () => {
-    const { authToken } = useAuth();
+    const getAuthToken = () => localStorage.getItem('token');
 
     const addSoldItem = async (reportId, itemData) => {
+        const token = getAuthToken()
         try {
             const response = await axios.post(`${API_URL}/${reportId}/add`, itemData, {
-                headers: { Authorization: `Bearer ${authToken}` }
+                headers: { Authorization: token }
             });
             return response.data;
         } catch (error) {
@@ -18,9 +19,10 @@ export const useSoldItemsApi = () => {
     };
 
     const editSoldItem = async (reportId, soldItemId, updatedData) => {
+        const token = getAuthToken()
         try {
             const response = await axios.put(`${API_URL}/${reportId}/edit/${soldItemId}`, updatedData, {
-                headers: { Authorization: `Bearer ${authToken}` }
+                headers: { Authorization: token }
             });
             return response.data;
         } catch (error) {
@@ -29,11 +31,12 @@ export const useSoldItemsApi = () => {
     };
 
     const deleteSoldItem = async (reportId, soldItemId) => {
+        const token = getAuthToken()
         try {
             const response = await axios.delete(`${API_URL}/${reportId}/delete/${soldItemId}`, {
-                headers: { Authorization: `Bearer ${authToken}` }
+                headers: { Authorization: token }
             });
-            return response.data;
+            return response.data;   
         } catch (error) {
             throw error.response?.data || 'Error deleting sold item.';
         }

@@ -6,7 +6,9 @@ import DebtsPage from './pages/DebtsPage';
 import ItemPage from './pages/ItemsPage';
 import ReportsPage from './pages/ReportsPage';
 import RegisterPage from './pages/RegisterPage';
- import LoginPage from './pages/LoginPage.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import ReportForm from './pages/ReportForm'
+
 // import NotFoundPage from './pages/NotFoundPage.jsx';
 import './App.css';
 
@@ -21,6 +23,8 @@ const App = () => {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/reports" element={<ReportsPage />} />
+                    <Route path="/reports/new" element={<ReportForm/>}/>
+                    <Route path="/reports/:id" element={<ReportForm />} />
                     {/* <Route path="*" element={<NotFoundPage />} /> */}
                 </Routes>
             </AuthProvider>

@@ -1,15 +1,15 @@
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
 
 const API_URL = '/api/reports';
 
 export const useReportsApi = () => {
-    const { authToken } = useAuth();
+    const getAuthToken = () => localStorage.getItem('token');
 
     const getReports = async () => {
+        const token = getAuthToken()
         try {
             const response = await axios.get(API_URL, {
-                headers: { Authorization: `Bearer ${authToken}` }
+                headers: { Authorization: token}
             });
             return response.data;
         } catch (error) {
@@ -18,9 +18,10 @@ export const useReportsApi = () => {
     };
 
     const addReport = async (reportData) => {
+        const token = getAuthToken()
         try {
             const response = await axios.post(`${API_URL}/create`, reportData, {
-                headers: { Authorization: `Bearer ${authToken}` }
+                headers: { Authorization: token }
             });
             return response.data;
         } catch (error) {
@@ -29,9 +30,10 @@ export const useReportsApi = () => {
     };
 
     const deleteReport = async (id) => {
+        const token = getAuthToken()
         try {
             const response = await axios.delete(`${API_URL}/delete/${id}`, {
-                headers: { Authorization: `Bearer ${authToken}` }
+                headers: { Authorization: token}
             });
             return response.data;
         } catch (error) {
