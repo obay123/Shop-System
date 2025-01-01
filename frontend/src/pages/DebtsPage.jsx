@@ -43,7 +43,7 @@ const DebtsPage = () => {
                 setItemOptions(items);
             } catch (error) {
                 console.error('Error fetching items:', error);
-                showNotification('خطأ في جلب السلع', 'error');
+                showNotification('خطأ في تحميل السلع', 'error');
             }
         };
         fetchItems();
@@ -55,9 +55,9 @@ const DebtsPage = () => {
             try {
                 const data = await getDebts();
                 setDebts(data);
-                showNotification('تم جلب الديون بنجاح','success')
+                showNotification('تم تحميل الديون بنجاح','success')
             } catch (error) {
-                showNotification(error.message || 'خطأ في جلب الديون', 'info');
+                showNotification(error.message || 'خطأ في تحميل الديون', 'info');
             } finally {
                 setIsLoading(false);
             }

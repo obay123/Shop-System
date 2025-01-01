@@ -30,9 +30,9 @@ const ItemsPage = () => {
             try {
                 const data = await getItems();
                 setItems(data);
-                showNotification('تم جلب السلع بنجاح', 'success');
+                showNotification('تم تحميل السلع بنجاح', 'success');
             } catch (error) {
-                showNotification(error.message || 'خطأ في جلب السلع', 'info');
+                showNotification(error.message || 'خطأ في تحميل السلع', 'info');
             } finally {
                 setLoading(false);
             }

@@ -206,9 +206,9 @@ const ReportForm = () => {
                 {report.soldItems.map((soldItem, index) => (
                   <tr key={index}>
                     <td>{soldItem.item.name}</td>
-                    <td>${soldItem.item.price}</td>
+                    <td>{soldItem.item.price}</td>
                     <td>{soldItem.quantitySold}</td>
-                    <td>${soldItem.total.toFixed(2)}</td>
+                    <td>{soldItem.total}</td>
                     {!id && (
                       <td>
                         <Button
@@ -227,10 +227,10 @@ const ReportForm = () => {
               <tfoot>
                 <tr>
                   <td colSpan="3" className="total-label">
-                    Total Amount:
+                  المبلغ الاجمالي
                   </td>
                   <td className="total-value">
-                    ${report.totalAmount.toFixed(2)}
+                    {report.totalAmount}
                   </td>
                   {!id && <td></td>}
                 </tr>
@@ -240,17 +240,18 @@ const ReportForm = () => {
 
           <div className="card-actions">
             <Button 
+            variant='danger'
               className="btn btn-secondary" 
               onClick={() => navigate('/reports')}
             >
-              Cancel
+              الغاء
             </Button>
             {!id && (
               <Button 
                 className="btn btn-primary"
                 onClick={handleSave}
               >
-                Save Report
+                حفظ التقرير
               </Button>
             )}
           </div>

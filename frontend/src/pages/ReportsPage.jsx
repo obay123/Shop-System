@@ -23,7 +23,7 @@ const ReportsPage = () => {
       try{
       const data = await getReports()
       setReports(data)
-     showNotification('تم جلب التقارير بنجاح','success')
+     showNotification('تم تحميل التقارير بنجاح','success')
       }catch(error){
         showNotification(error.message || 'خطأ في جلب التقارير','error')
       }finally{
