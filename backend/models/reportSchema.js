@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
 const reportSchema = new mongoose.Schema({
+  shopId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Shop', 
+    required: true
+  },
+
   date: {
     type: Date,
     required: true,

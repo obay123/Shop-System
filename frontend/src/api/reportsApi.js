@@ -5,6 +5,20 @@ const API_URL = '/api/reports';
 export const useReportsApi = () => {
     const getAuthToken = () => localStorage.getItem('token');
 
+    const updateReport = async (reportId, reportData) => {
+        const token = getAuthToken()
+        try {
+            const response = await axios.put(`${API_URL}/${reportId}`, reportData,{
+                headers: { Authorization: token }
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error updating report:', error);
+            throw error;
+        }
+    };
+
+
     const getReports = async () => {
         const token = getAuthToken()
         try {
@@ -14,6 +28,33 @@ export const useReportsApi = () => {
             return response.data;
         } catch (error) {
             throw error.response?.data || 'Error fetching reports.';
+        }
+    };
+
+
+
+    const getReportByDate = async(date)=>{
+        const token = getAuthToken()
+        try{
+            const response = await axios.get(`${API_URL}/${date}`,{
+                headers:{Authorization: token}
+            })
+           
+            return response.data
+        }catch(error){
+                throw error.response?.data || 'error fetching report by date'
+        }
+    };
+
+    const getReportById = async (id) => {
+        const token = getAuthToken()
+        try {
+            const response = await axios.get(`${API_URL}/${id}`,{
+                headers: { Authorization: token}
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || error.message;
         }
     };
 
@@ -41,5 +82,5 @@ export const useReportsApi = () => {
         }
     };
 
-    return { getReports, addReport, deleteReport };
+    return { getReports, addReport, deleteReport , getReportById ,getReportByDate,updateReport};
 };

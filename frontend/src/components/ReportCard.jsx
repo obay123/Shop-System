@@ -25,7 +25,7 @@ const ReportCard = ({ report, onView, onDelete }) => {
 
         <div className="card-actions">
           <Button 
-            onClick={() => onView(report._id)}
+            onClick={() => onView(report.date.slice(0, 10))}
             className="btn btn-secondary"
           >
             عرض التفاصيل

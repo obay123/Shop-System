@@ -24,7 +24,7 @@ const App = () => {
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/reports" element={<ReportsPage />} />
                     <Route path="/reports/new" element={<ReportForm/>}/>
-                    <Route path="/reports/:id" element={<ReportForm />} />
+                    <Route path="/reports/:date" element={<ReportForm />} />
                     {/* <Route path="*" element={<NotFoundPage />} /> */}
                 </Routes>
             </AuthProvider>

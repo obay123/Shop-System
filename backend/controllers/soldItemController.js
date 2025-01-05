@@ -5,10 +5,15 @@ const Item = require('../models/itemSchema');
 exports.addSoldItemToReport = async (req, res) => {
   const { reportId } = req.params;
   const { itemId, quantitySold } = req.body;
+  const shopId = req.shopId
+
+  if (!shopId) {
+    return res.status(400).json({ message: 'Shop ID is required.' });
+  }
 
   try {
     // Find the report
-    const report = await Report.findById(reportId);
+     const report = await Report.findOne({ _id: reportId, shopId });
     if (!report) {
       return res.status(404).json({ message: `Report with ID ${reportId} not found` });
     }
@@ -81,27 +86,26 @@ exports.editSingleSoldItemInReport = async (req, res) => {
 
 // Delete a single sold item from a report
 exports.deleteSingleSoldItemFromReport = async (req, res) => {
-  const { reportId, soldItemId } = req.params;
-
   try {
-    const report = await Report.findById(reportId);
+    const { reportId, soldItemId } = req.params;
+    const shopId = req.shopId;
+
+    const report = await Report.findOne({ _id: reportId, shopId });
     if (!report) {
-      return res.status(404).json({ message: 'Report not found' });
+      return res.status(404).json({ message: 'Report not found.' });
     }
 
-    const soldItemIndex = report.soldItems.findIndex(item => item._id.toString() === soldItemId);
-    if (soldItemIndex === -1) {
-      return res.status(404).json({ message: 'Sold item not found in report' });
+    const soldItem = report.soldItems.id(soldItemId);
+    if (!soldItem) {
+      return res.status(404).json({ message: 'Sold item not found.' });
     }
 
-    const soldItem = report.soldItems[soldItemIndex];
-    report.totalAmount -= soldItem.total;  // Deduct item total from report total
-    report.soldItems.splice(soldItemIndex, 1);  // Remove sold item from array
+    report.totalAmount -= soldItem.total;
+    soldItem.remove();
 
     const updatedReport = await report.save();
-    res.status(200).json({ message: 'Sold item deleted from report', report: updatedReport });
+    res.status(200).json(updatedReport);
   } catch (error) {
-    console.error("Error deleting sold item from report:", error);
-    res.status(500).json({ message: 'Error deleting sold item from report', error });
+    res.status(500).json({ message: 'Error deleting sold item.', error });
   }
 };
