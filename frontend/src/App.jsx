@@ -8,8 +8,7 @@ import ReportsPage from './pages/ReportsPage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage.jsx';
 import ReportForm from './pages/ReportForm'
-
-// import NotFoundPage from './pages/NotFoundPage.jsx';
+import NotFoundPage from './pages/NotFoundPage.jsx';
 import './App.css';
 
 const App = () => {
@@ -25,7 +24,7 @@ const App = () => {
                     <Route path="/reports" element={<ReportsPage />} />
                     <Route path="/reports/new" element={<ReportForm/>}/>
                     <Route path="/reports/:date" element={<ReportForm />} />
-                    {/* <Route path="*" element={<NotFoundPage />} /> */}
+                    <Route path="*" element={<NotFoundPage />} /> 
                 </Routes>
             </AuthProvider>
         </div>

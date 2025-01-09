@@ -18,7 +18,7 @@ const LoginPage = () => {
         try {
             const response = await loginShop({ email, password });
             localStorage.setItem('token', response.data.token);
-            navigate('/debts'); 
+            navigate('/'); 
         } catch (err) {
             setError('Invalid email or password');
         }

@@ -4,12 +4,14 @@ import { useReportsApi } from '../api/reportsApi';
 import Button from '../components/Button';
 import ReportCard from '../components/ReportCard';
 import Notification from '../components/Notification';
+import Input from '../components/Input';
 
 const ReportsPage = () => {
   const [notification, setNotification] = useState({ message: '', type: '' });
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [hasReportForToday, setHasReportForToday] = useState(false);
+  const [searchDate, setSearchDate] = useState('');
   const { getReports, deleteReport } = useReportsApi();
   const navigate = useNavigate();
 
@@ -19,14 +21,18 @@ const ReportsPage = () => {
   };
 
   const checkTodayReport = (reports) => {
-    const today = new Date().toISOString().split('T')[0]; // Get YYYY-MM-DD
-    
+    const today = new Date().toISOString().split('T')[0];
     return reports.some(report => {
-      // Extract YYYY-MM-DD from report date
       const reportDate = report.date.split('T')[0];
       return reportDate === today;
     });
   };
+
+  const filteredReports = reports.filter(report => {
+    if (!searchDate) return true;
+    const reportDate = report.date.split('T')[0];
+    return reportDate.includes(searchDate);
+  });
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -54,7 +60,6 @@ const ReportsPage = () => {
         await deleteReport(id);
         showNotification('تم مسح التقرير بنجاح', 'success');
         
-        // Update reports state and recheck today's report
         const updatedReports = reports.filter((report) => report._id !== id);
         setReports(updatedReports);
         setHasReportForToday(checkTodayReport(updatedReports));
@@ -81,6 +86,13 @@ const ReportsPage = () => {
       <div className="page-header">
         <h1 className="page-title">تقارير البيع</h1>
         <div className="header-actions">
+          <Input 
+            type="date"
+            value={searchDate}
+            onChange={(e) => setSearchDate(e.target.value)}
+            className="search-input"
+            placeholder="البحث حسب التاريخ..."
+          />
           <Button 
             onClick={handleCreateReport}
             className="btn btn-primary"
@@ -100,7 +112,7 @@ const ReportsPage = () => {
         <div className="loading">جاري تحميل التقارير ...</div>
       ) : (
         <div className="items-grid">
-          {reports.map(report => (
+          {filteredReports.map(report => (
             <ReportCard
               key={report._id}
               report={report}
@@ -108,8 +120,10 @@ const ReportsPage = () => {
               onDelete={handleDelete}
             />
           ))}
-          {reports.length === 0 && (
-            <div className="no-data">لا يوجد تقارير</div>
+          {filteredReports.length === 0 && (
+            <div className="no-data">
+              {searchDate ? 'لا يوجد تقارير في هذا التاريخ' : 'لا يوجد تقارير'}
+            </div>
           )}
         </div>
       )}
@@ -117,4 +131,4 @@ const ReportsPage = () => {
   );
 };
 
-export default ReportsPage; 
+export default ReportsPage;
