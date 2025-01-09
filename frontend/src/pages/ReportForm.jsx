@@ -114,8 +114,8 @@ const ReportForm = () => {
       return;
     }
 
-    const parsedQuantity = parseInt(quantity);
-    if (isNaN(parsedQuantity) || parsedQuantity < 1) {
+    const parsedQuantity = quantity;
+    if (isNaN(parsedQuantity) || parsedQuantity < 0) {
       setError('Invalid quantity');
       return;
     }
@@ -156,6 +156,7 @@ const ReportForm = () => {
 
     try {
       if (report._id && soldItemId) {
+        console.log(report._id , soldItemId)
         await deleteSoldItem(report._id, soldItemId);
       }
 
@@ -169,6 +170,7 @@ const ReportForm = () => {
         };
       });
       setError(null);
+      console.log(report._id , soldItemId)
     } catch (error) {
       console.error('Failed to remove item:', error);
       setError('Failed to remove item');

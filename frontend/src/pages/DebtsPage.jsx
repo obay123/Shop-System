@@ -293,7 +293,9 @@ const DebtsPage = () => {
                         <h3>تفاصيل الدين</h3>
                         <p>
                             <strong>اسم المشتري:</strong> {selectedDebt.name}
+                           
                         </p>
+                         {selectedDebt.date.split('T')[0]}
                         <h4>المشتريات</h4>
                         <ul>
                             {selectedDebt.items?.map((item) => (
