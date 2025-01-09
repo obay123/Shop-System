@@ -155,10 +155,10 @@ const ReportForm = () => {
     if (!canEdit) return;
 
     try {
-      if (report._id && soldItemId) {
-        console.log(report._id , soldItemId)
-        await deleteSoldItem(report._id, soldItemId);
-      }
+      // if (report._id && soldItemId) {
+      //   console.log(report._id , soldItemId)
+      //   await deleteSoldItem(report._id, soldItemId);
+      // }
 
       setReport(prev => {
         const newSoldItems = [...prev.soldItems];
@@ -310,7 +310,7 @@ const ReportForm = () => {
               <tfoot>
                 <tr>
                   <td colSpan="3" className="total-label">
-                    المبلغ الاجمالي
+                    المجموع العام
                   </td>
                   <td className="total-value">
                     {report.totalAmount || 0}
