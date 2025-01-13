@@ -37,6 +37,11 @@ const HomePage = () => {
     setTimeout(() => setNotification({ message: '', type: '' }), 3000);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    navigate('/login');
+  };
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -113,12 +118,15 @@ const HomePage = () => {
 
   return (
     <div>
-      <section className="welcome-section">
-        <div className="welcome-content">
+    <section className="welcome-section">
+      <button className="logout-button" onClick={handleLogout}>
+        <span>تسجيل الخروج</span>
+      </button>
+      <div className="welcome-content">
         <h1>مرحباً بك في نظام إدارة محل الألبان</h1>
-          <p>نظام متكامل لإدارة المخزون وتتبع المبيعات والديون</p>
-        </div>
-      </section>
+        <p>نظام متكامل لإدارة المخزون وتتبع المبيعات والديون</p>
+      </div>
+    </section>
       
       <div className="home-container">
         {notification.message && (

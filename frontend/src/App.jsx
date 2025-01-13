@@ -6,9 +6,10 @@ import DebtsPage from './pages/DebtsPage';
 import ItemPage from './pages/ItemsPage';
 import ReportsPage from './pages/ReportsPage';
 import RegisterPage from './pages/RegisterPage';
-import LoginPage from './pages/LoginPage.jsx';
-import ReportForm from './pages/ReportForm'
-import NotFoundPage from './pages/NotFoundPage.jsx';
+import LoginPage from './pages/LoginPage';
+import ReportForm from './pages/ReportForm';
+import NotFoundPage from './pages/NotFoundPage';
+import PrivateRoute from './PrivateRoute.jsx';
 import './App.css';
 
 const App = () => {
@@ -16,15 +17,62 @@ const App = () => {
         <div style={{ direction: 'rtl' }}>
             <AuthProvider>
                 <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/debts" element={<DebtsPage />} />
-                    <Route path="/items" element={<ItemPage />} />
+                    {/* Public Routes */}
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
-                    <Route path="/reports" element={<ReportsPage />} />
-                    <Route path="/reports/new" element={<ReportForm/>}/>
-                    <Route path="/reports/:date" element={<ReportForm />} />
-                    <Route path="*" element={<NotFoundPage />} /> 
+                    
+                    {/* Private Routes */}
+                    <Route 
+                        path="/" 
+                        element={
+                            <PrivateRoute>
+                                <HomePage />
+                            </PrivateRoute>
+                        } 
+                    />
+                    <Route 
+                        path="/debts" 
+                        element={
+                            <PrivateRoute>
+                                <DebtsPage />
+                            </PrivateRoute>
+                        } 
+                    />
+                    <Route 
+                        path="/items" 
+                        element={
+                            <PrivateRoute>
+                                <ItemPage />
+                            </PrivateRoute>
+                        } 
+                    />
+                    <Route 
+                        path="/reports" 
+                        element={
+                            <PrivateRoute>
+                                <ReportsPage />
+                            </PrivateRoute>
+                        } 
+                    />
+                    <Route 
+                        path="/reports/new" 
+                        element={
+                            <PrivateRoute>
+                                <ReportForm />
+                            </PrivateRoute>
+                        } 
+                    />
+                    <Route 
+                        path="/reports/:date" 
+                        element={
+                            <PrivateRoute>
+                                <ReportForm />
+                            </PrivateRoute>
+                        } 
+                    />
+
+                    {/* Catch-all Route */}
+                    <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </AuthProvider>
         </div>

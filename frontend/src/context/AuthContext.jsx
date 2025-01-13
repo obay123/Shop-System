@@ -1,43 +1,40 @@
-import React, { createContext, useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [authToken, setAuthToken] = useState(null); // Store token in state
-    const navigate = useNavigate();
+    const [user, setUser] = useState(null);
 
-    // Login function to store token in state and localStorage
-    const login = (token) => {
-        setAuthToken(token);
-        localStorage.setItem('authToken', token);
-        navigate('/homepage');
+    const login = (userData, token) => {
+        console.log(userData)
+        setUser(userData);
+        localStorage.setItem('token', token);
     };
 
-    // Logout function to clear token
     const logout = () => {
-        setAuthToken(null);
-        localStorage.removeItem('authToken');
-        navigate('/auth/login');
+        setUser(null);
+        localStorage.removeItem('token');
     };
 
-    // Check if the user is authenticated
-    const isAuthenticated = () => !!authToken;
-
-    // Load token from localStorage on app load
-    React.useEffect(() => {
-        const token = localStorage.getItem('authToken');
+    useEffect(() => {
+        // On component mount, check if a token exists in localStorage
+        const token = localStorage.getItem('token');
         if (token) {
-            setAuthToken(token);
+            // Optionally decode or validate the token and fetch user data
+            // Example: Decode token to get user data
+            console.log(token)
+            const userData = { username: 'ExampleUser' }; 
+            setUser(userData);
         }
     }, []);
 
+    const isAuthenticated = Boolean(localStorage.getItem('token')); 
+
     return (
-        <AuthContext.Provider value={{ authToken, login, logout, isAuthenticated }}>
+        <AuthContext.Provider value={{ user, login, logout, isAuthenticated }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-// Custom Hook to use AuthContext
 export const useAuth = () => useContext(AuthContext);
