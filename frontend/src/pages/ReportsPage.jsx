@@ -5,6 +5,9 @@ import Button from '../components/Button';
 import ReportCard from '../components/ReportCard';
 import Notification from '../components/Notification';
 import Input from '../components/Input';
+import { Home, FileText, PiggyBank } from 'lucide-react';
+
+
 
 const ReportsPage = () => {
   const [notification, setNotification] = useState({ message: '', type: '' });
@@ -19,6 +22,10 @@ const ReportsPage = () => {
     setNotification({ message, type });
     setTimeout(() => setNotification({ message: '', type: '' }), 3000);
   };
+
+  const handleNavigate = (path) => {
+    navigate(path);
+};
 
   const checkTodayReport = (reports) => {
     const today = new Date().toISOString().split('T')[0];
@@ -83,7 +90,30 @@ const ReportsPage = () => {
 
   return (
     <div className="page-container">
-      <div className="page-header">
+            <div className="page-header">
+                <div className="navigation-icons">
+                    <button 
+                        className="nav-icon-button" 
+                        onClick={() => handleNavigate('/')}
+                        title="الصفحة الرئيسية"
+                    >
+                        <Home size={24} />
+                    </button>
+                    <button 
+                        className="nav-icon-button" 
+                        onClick={() => handleNavigate('/reports')}
+                        title="التقارير"
+                    >
+                        <FileText size={24} />
+                    </button>
+                    <button 
+                        className="nav-icon-button" 
+                        onClick={() => handleNavigate('/debts')}
+                        title="الديون"
+                    >
+                        <PiggyBank size={24} />
+                    </button>
+                </div>
         <h1 className="page-title">تقارير البيع</h1>
         <div className="header-actions">
           <Input 

@@ -7,9 +7,10 @@ import Modal from '../components/Modals';
 import FormLayout from '../components/FormLayout';
 import Notification from '../components/Notification';
 import { useNavigate } from 'react-router-dom';
-import { logoutShop } from '../api/authApi';
 import UpdateDebtModal from '../components/updateDebtModal';
 import { useItemsApi } from '../api/itemsApi';
+import { Home, FileText, PiggyBank } from 'lucide-react';
+
 
 const DebtsPage = () => {
     const [showEditModal, setShowEditModal] = useState(false);
@@ -33,6 +34,11 @@ const DebtsPage = () => {
         setNotification({ message, type });
         setTimeout(() => setNotification({ message: '', type: '' }), 3000);
     };
+
+    const handleNavigate = (path) => {
+        navigate(path);
+    };
+    
 
     const { getItems } = useItemsApi();
 
@@ -146,16 +152,6 @@ const DebtsPage = () => {
         }
     };
 
-    // const handleLogout = async () => {
-    //     try {
-    //         await logoutShop();
-    //         localStorage.removeItem('token');
-    //         navigate('/login');
-    //     } catch (error) {
-    //         console.error('Error during logout', error);
-    //     }
-    // };
-
     const handleShowDebtDetails = (debt) => {
         setSelectedDebt(debt);
         setShowDebtDetailsModal(true);
@@ -169,6 +165,29 @@ const DebtsPage = () => {
     return (
         <div className="page-container">
         <div className="page-header">
+            <div className="navigation-icons">
+                <button 
+                    className="nav-icon-button" 
+                    onClick={() => handleNavigate('/')}
+                    title="الصفحة الرئيسية"
+                >
+                    <Home size={24} />
+                </button>
+                <button 
+                    className="nav-icon-button" 
+                    onClick={() => handleNavigate('/reports')}
+                    title="التقارير"
+                >
+                    <FileText size={24} />
+                </button>
+                <button 
+                    className="nav-icon-button" 
+                    onClick={() => handleNavigate('/debts')}
+                    title="الديون"
+                >
+                    <PiggyBank size={24} />
+                </button>
+            </div>
             <h1 className="page-title">إدارة الديون</h1>
             <div className="header-actions">
             <Input 

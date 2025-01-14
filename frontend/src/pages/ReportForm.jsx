@@ -208,16 +208,14 @@ const ReportForm = () => {
     return (
       <div className="page-container">
         <Card>
-          <div className="loading">Loading...</div>
+          <div className="loading">جاري تحميل النموذج ...</div>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="page-container">
       <Card>
-        <div className="form-layout">
           {error && (
             <div className="error-message text-red-500 mb-4">
               {error}
@@ -338,9 +336,7 @@ const ReportForm = () => {
               </Button>
             )}
           </div>
-        </div>
       </Card>
-    </div>
   );
 };
 

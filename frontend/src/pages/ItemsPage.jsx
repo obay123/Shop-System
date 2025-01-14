@@ -5,6 +5,8 @@ import Card from '../components/Card';
 import Input from '../components/Input';
 import Modal from '../components/Modals';
 import Notification from '../components/Notification';
+import { Home, FileText, PiggyBank } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const ItemsPage = () => {
     const { getItems, addItem, updateItem, deleteItem } = useItemsApi();
@@ -15,7 +17,7 @@ const ItemsPage = () => {
     const [editingItem, setEditingItem] = useState(null);
     const [notification, setNotification] = useState({ message: '', type: '' });
     const [searchTerm, setSearchTerm] = useState('');
-
+    const navigate = useNavigate()
     const filteredItems = items.filter(item => 
         item.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -23,6 +25,10 @@ const ItemsPage = () => {
     const showNotification = (message, type = 'info') => {
         setNotification({ message, type });
         setTimeout(() => setNotification({ message: '', type: '' }), 3000);
+    };
+
+    const handleNavigate = (path) => {
+        navigate(path);
     };
 
     useEffect(() => {
@@ -91,21 +97,44 @@ const ItemsPage = () => {
 
     return (
         <div className="page-container">
-        <div className="page-header">
-            <h1 className="page-title">إدارة العناصر</h1>
-            <div className="header-actions">
-                <Input 
-                    type="text"
-                    placeholder="بحث عن منتج..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="search-input"
-                />
-                <Button onClick={() => setShowModal(true)} className="add-button">
-                    إضافة عنصر جديد
-                </Button>
+            <div className="page-header">
+                <div className="navigation-icons">
+                    <button 
+                        className="nav-icon-button" 
+                        onClick={() => handleNavigate('/')}
+                        title="الصفحة الرئيسية"
+                    >
+                        <Home size={24} />
+                    </button>
+                    <button 
+                        className="nav-icon-button" 
+                        onClick={() => handleNavigate('/reports')}
+                        title="التقارير"
+                    >
+                        <FileText size={24} />
+                    </button>
+                    <button 
+                        className="nav-icon-button" 
+                        onClick={() => handleNavigate('/debts')}
+                        title="الديون"
+                    >
+                        <PiggyBank size={24} />
+                    </button>
+                </div>
+                <h1 className="page-title">إدارة العناصر</h1>
+                <div className="header-actions">
+                    <Input 
+                        type="text"
+                        placeholder="بحث عن منتج..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="search-input"
+                    />
+                    <Button onClick={() => setShowModal(true)} className="add-button">
+                        إضافة عنصر جديد
+                    </Button>
+                </div>
             </div>
-        </div>
 
         {loading && <Notification message="جارٍ تحميل البيانات..." type="info" />}
         {notification.message && (
