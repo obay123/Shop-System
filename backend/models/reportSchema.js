@@ -17,6 +17,11 @@ const reportSchema = new mongoose.Schema({
     required: true,
     default: 0
   },
+  debtPaid: { 
+    type: Number,
+    required: true,
+    default: 0
+  },
   soldItems: [{
     itemId: {
       type: mongoose.Schema.Types.ObjectId,

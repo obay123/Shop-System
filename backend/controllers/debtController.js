@@ -1,5 +1,6 @@
 const Debt = require("../models/debtSchema");
 const Item = require("../models/itemSchema");
+const Report = require("../models/reportSchema"); 
 
 exports.addDebt = async (req, res) => {
   const shopId = req.shopId;
@@ -61,6 +62,8 @@ exports.addDebt = async (req, res) => {
   }
 };
 
+
+
 exports.editDebt = async (req, res) => {
   const { id } = req.params;
   const { paidAmount, newItems, name } = req.body; // Include name in the body
@@ -84,7 +87,7 @@ exports.editDebt = async (req, res) => {
 
     // Handle name update
     if (name) {
-      debt.name = name;  // Update the name if it's provided
+      debt.name = name; // Update the name if it's provided
     }
 
     // Handle paid amount update
@@ -93,6 +96,25 @@ exports.editDebt = async (req, res) => {
         return res.status(400).json({ message: "Paid amount exceeds the total debt" });
       }
       debt.amount -= paidAmount;
+
+      // Update the daily report
+      const currentDate = new Date()//.toISOString().split("T")[0]; // Get today's date (YYYY-MM-DD)
+      currentDate.setUTCHours(0, 0, 0, 0)
+      const report = await Report.findOne({ shopId, date: currentDate });
+      console.log(currentDate)
+      if (report) {
+        report.debtPaid += paidAmount; // Add the paid amount to the report's debtPaid field
+        await report.save();
+      } else {
+        // // If the report for today doesn't exist, create a new one
+        // const newReport = new Report({
+        //   shopId,
+        //   date: currentDate,
+        //   debtPaid: paidAmount, // Initialize debtPaid with the paid amount
+        // });
+        // await newReport.save();
+        return res.status(400).json({message:`report with ${currentDate} not found`})
+      }
 
       if (debt.amount === 0) {
         await Debt.findByIdAndDelete(id);
@@ -152,7 +174,6 @@ exports.editDebt = async (req, res) => {
     });
   }
 };
-
 
 exports.deleteDebt = async (req, res) => {
   const { id } = req.params;

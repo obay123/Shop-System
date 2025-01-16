@@ -91,7 +91,7 @@ exports.createReport = async (req, res) => {
       shopId,
       soldItems: reportSoldItems,
       totalAmount,
-      date: new Date() // This will store the current date and time
+      date: new Date().toISOString().split('T')[0]  
     });
 
     const savedReport = await newReport.save();

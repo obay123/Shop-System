@@ -15,8 +15,10 @@ const ReportForm = () => {
     _id: null,
     date: new Date().toISOString().split('T')[0],
     soldItems: [],
-    totalAmount: 0
-  });
+    totalAmount: 0,
+    debtPaid: 0, 
+});
+
   const [selectedItem, setSelectedItem] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -63,7 +65,8 @@ const ReportForm = () => {
             _id: fetchedReport._id,
             date: fetchedReport.date,
             soldItems: formattedSoldItems,
-            totalAmount: fetchedReport.totalAmount
+            totalAmount: fetchedReport.totalAmount,
+            debtPaid: fetchedReport.debtPaid
           });
           
           const isEditable = checkEditPermissions(fetchedReport.date);
@@ -186,9 +189,10 @@ const ReportForm = () => {
             soldItems: report.soldItems.map(({ itemId, quantitySold, total }) => ({
                 itemId,
                 quantitySold,
-                total
+                total,
             })),
-            totalAmount: report.totalAmount || 0
+            totalAmount: report.totalAmount || 0,
+            debtPaid: report.debtPaid || 0,
         };
 
         if (report._id) {
@@ -196,7 +200,7 @@ const ReportForm = () => {
         } else {
             await addReport(reportData);
         }
-        
+
         navigate('/reports');
     } catch (error) {
         console.error('Failed to save report:', error);
@@ -206,11 +210,11 @@ const ReportForm = () => {
 
   if (loading) {
     return (
-      <div className="page-container">
+      
         <Card>
           <div className="loading">جاري تحميل النموذج ...</div>
         </Card>
-      </div>
+      
     );
   }
 
@@ -314,6 +318,22 @@ const ReportForm = () => {
                     {report.totalAmount || 0}
                   </td>
                   {canEdit && <td></td>}
+                </tr>
+                <tr>
+                  <td colSpan="3" className='total-label'>
+                  دفوعات ديون
+                  </td>
+                  <td className='total-value'>
+                    {report.debtPaid }
+                  </td>
+                </tr>
+                <tr>
+                <td colSpan='3' className="total-label" >
+                  المجموع الشامل
+                </td>
+                <td  className='total-value'>
+                  {Number(report.debtPaid) + Number(report.totalAmount)}
+                </td>
                 </tr>
               </tfoot>
             </table>
