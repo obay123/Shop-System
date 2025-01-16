@@ -197,7 +197,7 @@ const DebtsPage = () => {
                     className="search-input"
                 />
                 <Button onClick={() => setShowAddModal(true)} className="add-button">
-                    إضافة عنصر جديد
+                    إضافة دين جديد
                 </Button>
             </div>
         </div>

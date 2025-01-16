@@ -11,18 +11,22 @@ const ReportCard = ({ report, onView, onDelete }) => {
           <h3 className="card-title">تقرير : {date}</h3>
         </div>
         
-        <div className="card-info">
+        {/* <div className="card-info">
           <div className="info-row">
             <span className="info-label">المجموع العام :</span>
             <span className="card-value">{report.totalAmount}ل.ل</span>
-          </div>
+          </div> */}
           
+          <div className="card-info">
+          <div className="info-row">
+            <span className="info-label">المجموع الشامل :</span>
+            <span className="card-value">{(report.debtPaid)+(report.totalAmount)||report.totalAmount}ل.ل</span>
+          </div>
           <div className="info-row">
             <span className="info-label">العناصر التي بيعت</span>
             <span className="card-value">{report.soldItems.length}</span>
           </div>
         </div>
-
         <div className="card-actions">
           <Button 
             onClick={() => onView(report.date.slice(0, 10))}
@@ -39,6 +43,7 @@ const ReportCard = ({ report, onView, onDelete }) => {
         </div>
       </div>
     </div>
+    // </div>
   );
 };
 

@@ -29,6 +29,7 @@ const RegisterPage = () => {
     };
 
     return (
+        <div className='register-form'>
         <FormLayout title="انشاء حساب">
             {error && <Notification message={error} type="error" />}
             <form onSubmit={handleRegister}>
@@ -48,7 +49,6 @@ const RegisterPage = () => {
                     id="owner"
                 />
                 <Input
-                    // label="Email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -57,7 +57,6 @@ const RegisterPage = () => {
                     id="email"
                 />
                 <Input
-                    // label="Password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -82,6 +81,7 @@ const RegisterPage = () => {
                 </Link>
             </div>
         </FormLayout>
+        </div>
     );
 };
 

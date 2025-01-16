@@ -22,7 +22,7 @@ const Input = ({ label, value, onChange, type = 'text', placeholder = '', requir
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
-                className="input-field"
+                className="input-field input"
                 required={required}
                 style={{
                     fontFamily: 'Cairo, sans-serif', // Arabic font

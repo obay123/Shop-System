@@ -18,6 +18,7 @@ const LoginPage = () => {
         try {
             const response = await loginShop({ email, password });
             localStorage.setItem('token', response.data.token);
+            console.log(response.data)
             navigate('/'); 
         } catch (err) {
             setError('Invalid email or password');
@@ -25,6 +26,7 @@ const LoginPage = () => {
     };
 
     return (
+        <div className='login-form'>
         <FormLayout title="تسجيل الدخول">
             {error && <Notification message={error} type="error" />}
             <form onSubmit={handleLogin}>
@@ -63,6 +65,7 @@ const LoginPage = () => {
                 </Link>
             </div>
         </FormLayout>
+        </div>
     );
 };
 

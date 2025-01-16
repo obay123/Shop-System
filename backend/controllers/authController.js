@@ -57,7 +57,7 @@ exports.loginShop = async (req, res) => {
         // Generate JWT
         const token = jwt.sign({ shopId: shop._id }, JWT_SECRET, { expiresIn: '24h' });
 
-        res.status(200).json({ message: 'Login successful', token });
+        res.status(200).json({ message: 'Login successful', token});
     } catch (error) {
         res.status(500).json({ message: 'Error logging in', error });
     }

@@ -19,6 +19,7 @@ const Button = ({
                 fontFamily: 'Cairo, sans-serif', // Arabic-friendly font
                 direction: 'rtl', // Explicit RTL
                 textAlign: 'center', // Center-align text for consistency
+                margin: '1px'
             }}
         >
             {children}
