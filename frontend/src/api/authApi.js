@@ -8,7 +8,7 @@ export const registerShop = async (shopData) => {
         return response;
     } catch (error) {
         console.error('Error during registration:', error.response ? error.response.data : error.message);
-        throw error; // Re-throw to be handled by your component
+        throw error; 
     }
 };
 

@@ -18,6 +18,7 @@ const LoginPage = () => {
         try {
             const response = await loginShop({ email, password });
             localStorage.setItem('token', response.data.token);
+            localStorage.setItem('name', response.data.shopName);
             console.log(response.data)
             navigate('/'); 
         } catch (err) {
@@ -31,7 +32,6 @@ const LoginPage = () => {
             {error && <Notification message={error} type="error" />}
             <form onSubmit={handleLogin}>
                 <Input
-                    // label="البريد الالكتروني"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -40,7 +40,6 @@ const LoginPage = () => {
                     id="email"
                 />
                 <Input
-                    // label="Password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}

@@ -822,7 +822,7 @@ opacity: 1;
 }
 
 .quick-link-card:hover {
-transform: translateY(-4px) scale(1.02);
+transform: translateY(-3px) scale(1);
 box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 

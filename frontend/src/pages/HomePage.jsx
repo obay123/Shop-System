@@ -31,6 +31,7 @@ const HomePage = () => {
     debtsTotal: 0
   });
   const [notification, setNotification] = useState({ message: '', type: '' });
+  const [shopName, setShopName] = useState('');
 
   const showNotification = (message, type = 'info') => {
     setNotification({ message, type });
@@ -43,6 +44,9 @@ const HomePage = () => {
   };
 
   useEffect(() => {
+    const name = localStorage.getItem('name'); 
+    setShopName(name || 'محل الألبان'); 
+
     const fetchDashboardData = async () => {
       try {
         const reports = await getReports();
@@ -123,7 +127,7 @@ const HomePage = () => {
         <span>تسجيل الخروج</span>
       </button>
       <div className="welcome-content">
-        <h1>مرحباً بك في نظام إدارة محل الألبان</h1>
+        <h1>مرحباً بك في نظام إدارة {shopName}</h1>
         <p>نظام متكامل لإدارة المخزون وتتبع المبيعات والديون</p>
       </div>
     </section>
