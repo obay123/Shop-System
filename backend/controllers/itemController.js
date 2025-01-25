@@ -9,7 +9,7 @@ exports.getItems = async (req, res) => {
     if (!shopId) {
       return res.status(400).json({ message: 'shopId is required but not provided' });
     }
-    const items = await Item.find()
+    const items = await Item.find({ shopId })
     if (items.length === 0) {
       return res.status(404).json({ message: "لم يتم العثور على اي عناصر" })
     }
