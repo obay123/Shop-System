@@ -2,23 +2,20 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()], // Plugins should be at the top level
-  esbuild: {
-    jsx: 'transform', // Enables JSX parsing and transformation
-  },
+  plugins: [react()],
   server: {
     proxy: {
-      // Proxy API calls to the backend server
       "/api": {
-        target: "http://localhost:5000", // Backend server URL
+        target: "https://shop-system-c7l0.onrender.com",
         changeOrigin: true,
-        secure: false, // Use this if the backend doesn't use HTTPS
+        secure: true,
       },
       "/auth": {
-        target: "http://localhost:5000", // Backend server URL
+        target: "https://shop-system-c7l0.onrender.com",
         changeOrigin: true,
-        secure: false,
+        secure: true,
       },
     },
   },
 });
+
