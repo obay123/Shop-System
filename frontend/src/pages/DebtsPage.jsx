@@ -7,7 +7,7 @@ import Modal from '../components/Modals';
 import FormLayout from '../components/FormLayout';
 import Notification from '../components/Notification';
 import { useNavigate } from 'react-router-dom';
-import UpdateDebtModal from '../components/updateDebtModal';
+import UpdateDebtModal from "../components/UpdateDebtModal";
 import { useItemsApi } from '../api/itemsApi';
 import { Home, FileText, PiggyBank } from 'lucide-react';
 
